@@ -1,0 +1,9 @@
+{
+  "name": "ecomindx",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm run build",
+    "install": "cd frontend && npm ci"
+  }
+}
