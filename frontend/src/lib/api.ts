@@ -1,4 +1,11 @@
-import type { CarbonInput, Entry, FootprintResult, InsightsResponse, LeaderboardEntry, CommunityTip } from "./types";
+import type {
+  CarbonInput,
+  Entry,
+  FootprintResult,
+  InsightsResponse,
+  LeaderboardEntry,
+  CommunityTip,
+} from "./types";
 import { calculateFootprint } from "./carbon/calculator";
 import { generateRuleBasedInsights } from "./carbon/rules";
 import { supabase } from "./supabaseClient";
@@ -40,16 +47,12 @@ export async function saveEntry(
     input,
     result,
   };
-  
+
   if (userId) {
     payload.user_id = userId;
   }
 
-  const { data, error } = await supabase
-    .from("entries")
-    .insert(payload)
-    .select()
-    .single();
+  const { data, error } = await supabase.from("entries").insert(payload).select().single();
 
   if (error) {
     throw new Error(`Failed to save entry: ${error.message}`);
@@ -62,21 +65,13 @@ export async function saveEntry(
 export async function listEntries(deviceId: string, userId?: string): Promise<Entry[]> {
   let query;
   if (userId) {
-    query = supabase
-      .from("entries")
-      .select("*")
-      .eq("user_id", userId);
+    query = supabase.from("entries").select("*").eq("user_id", userId);
   } else {
     // Maintain exact original method chain to keep test mocks compatible
-    query = supabase
-      .from("entries")
-      .select("*")
-      .eq("device_id", deviceId);
+    query = supabase.from("entries").select("*").eq("device_id", deviceId);
   }
 
-  const { data, error } = await query
-    .order("created_at", { ascending: false })
-    .limit(50);
+  const { data, error } = await query.order("created_at", { ascending: false }).limit(50);
 
   if (error) {
     throw new Error(`Failed to load history: ${error.message}`);
@@ -150,7 +145,7 @@ export async function saveTip(
   title: string,
   description: string,
   authorName: string,
-  userId?: string
+  userId?: string,
 ): Promise<CommunityTip> {
   const payload: Record<string, unknown> = {
     category,
@@ -163,11 +158,7 @@ export async function saveTip(
     payload.user_id = userId;
   }
 
-  const { data, error } = await supabase
-    .from("community_tips")
-    .insert(payload)
-    .select()
-    .single();
+  const { data, error } = await supabase.from("community_tips").insert(payload).select().single();
 
   if (error) {
     throw new Error(`Failed to save tip: ${error.message}`);
@@ -178,13 +169,9 @@ export async function saveTip(
 
 /** Delete a shared community tip. Only succeeds if authenticated user matches user_id. */
 export async function deleteTip(tipId: string): Promise<void> {
-  const { error } = await supabase
-    .from("community_tips")
-    .delete()
-    .eq("id", tipId);
+  const { error } = await supabase.from("community_tips").delete().eq("id", tipId);
 
   if (error) {
     throw new Error(`Failed to delete tip: ${error.message}`);
   }
 }
-

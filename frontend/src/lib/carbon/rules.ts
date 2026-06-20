@@ -1,4 +1,10 @@
-import type { CarbonInput, FootprintResult, InsightsResponse, Recommendation, DietType } from "../types";
+import type {
+  CarbonInput,
+  FootprintResult,
+  InsightsResponse,
+  Recommendation,
+  DietType,
+} from "../types";
 import * as factors from "./factors";
 
 const _FLIGHT_REDUCTION_SHARE = 0.5;
@@ -99,7 +105,10 @@ function _consumption_recommendation(amount: number): Recommendation | null {
   };
 }
 
-export function generateRuleBasedInsights(data: CarbonInput, result: FootprintResult): InsightsResponse {
+export function generateRuleBasedInsights(
+  data: CarbonInput,
+  result: FootprintResult,
+): InsightsResponse {
   const builders: Record<string, (amt: number) => Recommendation | null> = {
     transport: (amt) => _transport_recommendation(data, amt),
     home: (amt) => _home_recommendation(amt),

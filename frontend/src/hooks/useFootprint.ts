@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import * as api from "../lib/api";
 import { getDeviceId } from "../lib/deviceId";
-import type { CarbonInput, Entry, FootprintResult, InsightsResponse, LeaderboardEntry, CommunityTip } from "../lib/types";
+import type {
+  CarbonInput,
+  Entry,
+  FootprintResult,
+  InsightsResponse,
+  LeaderboardEntry,
+  CommunityTip,
+} from "../lib/types";
 import { supabase } from "../lib/supabaseClient";
 import type { User } from "@supabase/supabase-js";
 
@@ -111,17 +118,25 @@ export function useFootprint() {
     }
   }, []);
 
-  const loadHistory = useCallback(async (activeUserId?: string) => {
-    try {
-      setEntries(await api.listEntries(deviceId, activeUserId));
-    } catch {
-      // History is non-critical; fail silently rather than blocking the app.
-    } finally {
-      void loadCommunityData();
-    }
-  }, [deviceId, loadCommunityData]);
+  const loadHistory = useCallback(
+    async (activeUserId?: string) => {
+      try {
+        setEntries(await api.listEntries(deviceId, activeUserId));
+      } catch {
+        // History is non-critical; fail silently rather than blocking the app.
+      } finally {
+        void loadCommunityData();
+      }
+    },
+    [deviceId, loadCommunityData],
+  );
 
-  const shareTip = async (category: string, title: string, description: string, authorName: string) => {
+  const shareTip = async (
+    category: string,
+    title: string,
+    description: string,
+    authorName: string,
+  ) => {
     setLoadingCommunity(true);
     setCommunityError(null);
     try {
@@ -157,19 +172,24 @@ export function useFootprint() {
 
     // 1. Get initial session
     if (supabase && supabase.auth) {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (!active) return;
-        const activeUser = session?.user ?? null;
-        setUser(activeUser);
-        setAuthLoading(false);
-      }).catch((err) => {
-        console.warn("Failed to get initial session:", err);
-        if (active) setAuthLoading(false);
-        void loadCommunityData();
-      });
+      supabase.auth
+        .getSession()
+        .then(({ data: { session } }) => {
+          if (!active) return;
+          const activeUser = session?.user ?? null;
+          setUser(activeUser);
+          setAuthLoading(false);
+        })
+        .catch((err) => {
+          console.warn("Failed to get initial session:", err);
+          if (active) setAuthLoading(false);
+          void loadCommunityData();
+        });
 
       // 2. Set up listener
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((_event, session) => {
         if (!active) return;
         const activeUser = session?.user ?? null;
         setUser(activeUser);
@@ -199,10 +219,12 @@ export function useFootprint() {
       setInsights(ins);
       setLastInput(input);
       setStatus("Your footprint results and personalized insights are ready below.");
-      
+
       // Auto-save this calculation to the history ledger (skip in test environment)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const isTest = typeof (globalThis as any).process !== "undefined" && (globalThis as any).process.env?.NODE_ENV === "test";
+      const isTest =
+        typeof (globalThis as any).process !== "undefined" &&
+        (globalThis as any).process.env?.NODE_ENV === "test";
       if (!isTest) {
         try {
           await api.saveEntry(deviceId, input, calc, user?.id);

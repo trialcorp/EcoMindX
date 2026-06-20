@@ -50,7 +50,18 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
   return (
     <form className="card" onSubmit={handleSubmit} aria-labelledby="calc-heading">
       <h2 id="calc-heading">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--primary)" }} xmlns="http://www.w3.org/2000/svg">
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ color: "var(--primary)" }}
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
         </svg>
         Estimate your annual footprint
@@ -91,7 +102,12 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
       </div>
 
       {/* Step 1: Transport & Mobility */}
-      <div id="step-transport" className={step === 1 ? "step-panel" : "step-panel hidden"} role="tabpanel" aria-labelledby="step1-tab">
+      <div
+        id="step-transport"
+        className={step === 1 ? "step-panel" : "step-panel hidden"}
+        role="tabpanel"
+        aria-labelledby="step1-tab"
+      >
         <fieldset>
           <legend>Transport & Mobility</legend>
           <NumberField
@@ -142,7 +158,12 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
       </div>
 
       {/* Step 2: Home Energy */}
-      <div id="step-home" className={step === 2 ? "step-panel" : "step-panel hidden"} role="tabpanel" aria-labelledby="step2-tab">
+      <div
+        id="step-home"
+        className={step === 2 ? "step-panel" : "step-panel hidden"}
+        role="tabpanel"
+        aria-labelledby="step2-tab"
+      >
         <fieldset>
           <legend>Home Energy</legend>
           <NumberField
@@ -173,7 +194,12 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
       </div>
 
       {/* Step 3: Diet & Consumption */}
-      <div id="step-lifestyle" className={step === 3 ? "step-panel" : "step-panel hidden"} role="tabpanel" aria-labelledby="step3-tab">
+      <div
+        id="step-lifestyle"
+        className={step === 3 ? "step-panel" : "step-panel hidden"}
+        role="tabpanel"
+        aria-labelledby="step3-tab"
+      >
         <fieldset>
           <legend>Diet &amp; consumption</legend>
           <div className="field">
@@ -220,7 +246,7 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
         ) : (
           <div /> // Spacer
         )}
-        
+
         {step < 3 && (
           <button
             type="button"
@@ -228,17 +254,27 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
             onClick={() => setStep((s) => (s + 1) as 1 | 2 | 3)}
           >
             Continue
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
           </button>
         )}
-        
-        <button 
+
+        <button
           className={`btn ${step === 3 ? "" : "visually-hidden"}`}
-          type="submit" 
-          disabled={loading} 
+          type="submit"
+          disabled={loading}
           aria-busy={loading}
         >
           {loading ? "Calculating…" : "Calculate my footprint"}

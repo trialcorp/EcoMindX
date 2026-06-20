@@ -30,7 +30,18 @@ export function InsightsPanel({ insights }: Props) {
   return (
     <section className="card" aria-labelledby="insights-heading">
       <h2 id="insights-heading">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--primary)" }} xmlns="http://www.w3.org/2000/svg">
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ color: "var(--primary)" }}
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
         </svg>
         Personalized insights{" "}
@@ -50,18 +61,26 @@ export function InsightsPanel({ insights }: Props) {
             <span className="title">Interactive simulation</span>
             <span className="description">Projected annual reduction from your commitments:</span>
           </div>
-          <div className="simulation-value">
-            -{formatKg(totalSimulatedSavings)} CO₂e / year
-          </div>
+          <div className="simulation-value">-{formatKg(totalSimulatedSavings)} CO₂e / year</div>
         </div>
       )}
 
-      <h3 style={{ fontFamily: "var(--font-display)", borderBottom: "1px solid var(--border)", paddingBottom: "0.5rem", marginBottom: "1rem" }}>
+      <h3
+        style={{
+          fontFamily: "var(--font-display)",
+          borderBottom: "1px solid var(--border)",
+          paddingBottom: "0.5rem",
+          marginBottom: "1rem",
+        }}
+      >
         Recommended actions
       </h3>
       <ul className="plain-list">
         {insights.recommendations.map((rec, i) => (
-          <li className={`recommendation ${committed[i] ? "committed" : ""}`} key={`${rec.category}-${i}`}>
+          <li
+            className={`recommendation ${committed[i] ? "committed" : ""}`}
+            key={`${rec.category}-${i}`}
+          >
             <div className="recommendation-content">
               <strong>{categoryLabel(rec.category)}:</strong> {rec.action}
               <div className="saving">
