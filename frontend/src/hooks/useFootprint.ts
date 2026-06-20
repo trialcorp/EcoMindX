@@ -201,6 +201,7 @@ export function useFootprint() {
       setStatus("Your footprint results and personalized insights are ready below.");
       
       // Auto-save this calculation to the history ledger (skip in test environment)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const isTest = typeof (globalThis as any).process !== "undefined" && (globalThis as any).process.env?.NODE_ENV === "test";
       if (!isTest) {
         try {
@@ -232,9 +233,10 @@ export function useFootprint() {
       setHasSavedCurrent(true);
       await loadHistory(user?.id);
       setStatus("Entry saved to your history.");
-    } catch (err: any) {
-      console.error("Save entry error:", err);
-      const detail = err instanceof Error ? err.message : "Please try again.";
+    } catch (err) {
+      const error = err as Error;
+      console.error("Save entry error:", error);
+      const detail = error.message || "Please try again.";
       setError(`Could not save this entry. Details: ${detail}`);
     } finally {
       setSaving(false);
@@ -291,8 +293,9 @@ export function useFootprint() {
       await api.claimDeviceHistory(deviceId, user.id);
       await loadHistory(user.id);
       setStatus("Device history claimed and synced.");
-    } catch (err: any) {
-      setError(err.message || "Failed to claim local history.");
+    } catch (err) {
+      const error = err as Error;
+      setError(error.message || "Failed to claim local history.");
     } finally {
       setSaving(false);
     }

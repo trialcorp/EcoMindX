@@ -241,8 +241,9 @@ export default function App() {
       }
       setEmail("");
       setPassword("");
-    } catch (err: any) {
-      setLocalAuthError(err.message || "Authentication failed.");
+    } catch (err) {
+      const error = err as Error;
+      setLocalAuthError(error.message || "Authentication failed.");
     }
   };
 
@@ -438,9 +439,9 @@ export default function App() {
         {user ? (
           <div className="header-profile-section">
             <span className="header-email-badge">{user.email}</span>
-            <div className="header-avatar" onClick={() => setActiveTab("account")} title="Go to Profile">
+            <button className="header-avatar" onClick={() => setActiveTab("account")} title="Go to Profile" style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
               {user.email?.[0].toUpperCase()}
-            </div>
+            </button>
             <button className="btn secondary" onClick={signOut} style={{ padding: "0.4rem 0.8rem", fontSize: "0.75rem", fontWeight: 700 }} disabled={authLoading}>
               Sign Out
             </button>
@@ -979,15 +980,17 @@ export default function App() {
                   <h3>{isSignUp ? "Create EcoMindX Account" : "Access Personal Intelligence"}</h3>
                   <p>
                     {isSignUp ? "Already have an account?" : "New to EcoMindX?"}{" "}
-                    <span 
+                    <button 
+                      type="button"
                       className="auth-toggle-link" 
                       onClick={() => {
                         setIsSignUp(!isSignUp);
                         setLocalAuthError(null);
                       }}
+                      style={{ background: "none", border: "none", cursor: "pointer", padding: 0, font: "inherit" }}
                     >
                       {isSignUp ? "Sign In" : "Register"}
-                    </span>
+                    </button>
                   </p>
                 </div>
 

@@ -35,7 +35,7 @@ export async function saveEntry(
   result: FootprintResult,
   userId?: string,
 ): Promise<Entry> {
-  const payload: Record<string, any> = {
+  const payload: Record<string, unknown> = {
     device_id: deviceId,
     input,
     result,

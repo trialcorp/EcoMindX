@@ -23,17 +23,17 @@ const mockDelete = vi.fn();
 vi.mock("./supabaseClient", () => ({
   supabase: {
     functions: {
-      invoke: (...args: any[]) => mockInvoke(...args),
+      invoke: (...args: unknown[]) => mockInvoke(...args),
     },
     from: vi.fn().mockReturnValue({
       insert: vi.fn().mockReturnValue({
         select: vi.fn().mockReturnValue({
-          single: (...args: any[]) => mockSingle(...args),
+          single: (...args: unknown[]) => mockSingle(...args),
         }),
       }),
-      select: (...args: any[]) => mockSelect(...args),
+      select: (...args: unknown[]) => mockSelect(...args),
       delete: vi.fn().mockReturnValue({
-        eq: (...args: any[]) => mockDelete(...args),
+        eq: (...args: unknown[]) => mockDelete(...args),
       }),
     }),
   },

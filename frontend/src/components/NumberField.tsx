@@ -41,6 +41,7 @@ export function NumberField({
     if (Number(inputValue) !== value) {
       setInputValue(value.toString());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   const handleInputChange = (valStr: string) => {
