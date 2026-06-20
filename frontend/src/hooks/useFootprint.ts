@@ -221,10 +221,10 @@ export function useFootprint() {
       setStatus("Your footprint results and personalized insights are ready below.");
 
       // Auto-save this calculation to the history ledger (skip in test environment)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const isTest =
-        typeof (globalThis as any).process !== "undefined" &&
-        (globalThis as any).process.env?.NODE_ENV === "test";
+      const _global = globalThis as unknown as Record<string, unknown>;
+      const _process = _global.process as Record<string, unknown> | undefined;
+      const _env = _process?.env as Record<string, string> | undefined;
+      const isTest = typeof _process !== "undefined" && _env?.NODE_ENV === "test";
       if (!isTest) {
         try {
           await api.saveEntry(deviceId, input, calc, user?.id);
