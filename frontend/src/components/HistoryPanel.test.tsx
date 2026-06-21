@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { HistoryPanel } from "./HistoryPanel";
 import { axe } from "vitest-axe";
 import { emptyInput } from "../lib/types";
+import type { Entry } from "../lib/types";
 
 describe("HistoryPanel", () => {
   const mockEntries = [
@@ -56,6 +57,41 @@ describe("HistoryPanel", () => {
 
     // Check if the trend chart title rendered
     expect(screen.getByText("Emissions Trend")).toBeInTheDocument();
+  });
+
+  it("renders trend up and neutral indicators", () => {
+    const upEntries = [
+      {
+        ...mockEntries[0],
+        id: "1",
+        result: { ...mockEntries[0].result, total_annual_tonnes: 6.0 },
+      },
+      {
+        ...mockEntries[1],
+        id: "2",
+        result: { ...mockEntries[1].result, total_annual_tonnes: 5.0 },
+      },
+    ];
+
+    const neutralEntries = [
+      {
+        ...mockEntries[0],
+        id: "1",
+        result: { ...mockEntries[0].result, total_annual_tonnes: 5.0 },
+      },
+      {
+        ...mockEntries[1],
+        id: "2",
+        result: { ...mockEntries[1].result, total_annual_tonnes: 5.0 },
+      },
+    ];
+
+    const { unmount } = render(<HistoryPanel entries={upEntries as unknown as Entry[]} />);
+    expect(screen.getByText(/▲ Up/)).toBeInTheDocument();
+    unmount();
+
+    render(<HistoryPanel entries={neutralEntries as unknown as Entry[]} />);
+    expect(screen.getByText(/No change since your last entry/)).toBeInTheDocument();
   });
 
   it("passes accessibility checks", async () => {

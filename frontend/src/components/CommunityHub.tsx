@@ -81,8 +81,8 @@ export function CommunityHub({
       setTipTitle("");
       setTipDesc("");
       setAuthorName("");
-    } catch (err) {
-      console.warn("Failed to share tip:", err);
+    } catch {
+      // Error is propagated by onShareTip; local cleanup only.
     } finally {
       setSharing(false);
     }

@@ -57,9 +57,28 @@ describe("InsightsPanel", () => {
     expect(screen.getByText("My Eco-Pledge")).toBeInTheDocument();
   });
 
+  it("calculates financial multiplier for other categories", async () => {
+    const mockInsightsExpanded = {
+      summary: "Test Summary",
+      recommendations: [
+        { category: "diet", action: "Eat veggies", estimated_annual_savings_kg: 100 },
+        { category: "consumption", action: "Buy less", estimated_annual_savings_kg: 100 },
+        { category: "unknown", action: "Do something else", estimated_annual_savings_kg: 100 },
+      ],
+      source: "rules" as const,
+    };
+    render(<InsightsPanel insights={mockInsightsExpanded} />);
+    await screen.findByText("Test Summary", undefined, { timeout: 3000 });
+    
+    const checkboxes = screen.getAllByRole("checkbox");
+    fireEvent.click(checkboxes[0]);
+    fireEvent.click(checkboxes[1]);
+    fireEvent.click(checkboxes[2]);
+    expect(screen.getByText(/Est. savings: ~\$75\/yr/)).toBeInTheDocument();
+  });
+
   it("passes accessibility checks", async () => {
     const { container } = render(<InsightsPanel insights={mockInsights} />);
-    // Wait for the panel to be fully rendered
     await screen.findByText("Test Summary", undefined, { timeout: 3000 });
     const results = await axe(container);
     expect(results).toHaveNoViolations();

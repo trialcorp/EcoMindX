@@ -65,8 +65,8 @@ export function useFootprint(user: User | null) {
       } else {
         localStorage.removeItem("ecomindx_active_result");
       }
-    } catch (e) {
-      console.warn("Failed to write result to localStorage:", e);
+    } catch {
+      // localStorage write is non-critical; silently ignored.
     }
   }, [result]);
 
@@ -77,8 +77,8 @@ export function useFootprint(user: User | null) {
       } else {
         localStorage.removeItem("ecomindx_active_input");
       }
-    } catch (e) {
-      console.warn("Failed to write input to localStorage:", e);
+    } catch {
+      // localStorage write is non-critical; silently ignored.
     }
   }, [lastInput]);
 
@@ -89,8 +89,8 @@ export function useFootprint(user: User | null) {
       } else {
         localStorage.removeItem("ecomindx_active_insights");
       }
-    } catch (e) {
-      console.warn("Failed to write insights to localStorage:", e);
+    } catch {
+      // localStorage write is non-critical; silently ignored.
     }
   }, [insights]);
 
@@ -130,8 +130,8 @@ export function useFootprint(user: User | null) {
           await api.saveEntry(deviceId, input, calc, user?.id);
           setHasSavedCurrent(true);
           await loadHistory(user?.id);
-        } catch (saveErr) {
-          console.warn("Failed to auto-save calculation to Supabase:", saveErr);
+        } catch {
+          // Auto-save is best-effort; calculation result is still valid.
         }
       } catch {
         setError("Something went wrong calculating your footprint. Please try again.");
@@ -158,7 +158,6 @@ export function useFootprint(user: User | null) {
       setStatus("Entry saved to your history.");
     } catch (err) {
       const detail = err instanceof Error ? err.message : "Please try again.";
-      console.warn("Save entry failed:", detail);
       setError(`Could not save this entry. Details: ${detail}`);
     } finally {
       setSaving(false);

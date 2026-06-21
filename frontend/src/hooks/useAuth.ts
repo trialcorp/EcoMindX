@@ -76,8 +76,8 @@ export function useAuth() {
           setUser(session?.user ?? null);
           setAuthLoading(false);
         })
-        .catch((err) => {
-          console.warn("Failed to get initial session:", err);
+        .catch(() => {
+          // Session recovery is best-effort; proceed as unauthenticated.
           if (active) setAuthLoading(false);
         });
 

@@ -280,8 +280,8 @@ export function EcoChallenges({ highestCategory }: Props) {
         const parsed = JSON.parse(saved) as Challenge[];
         if (parsed && parsed.length > 0) return parsed;
       }
-    } catch (e) {
-      console.warn("Failed to load quests from localStorage:", e);
+    } catch {
+      // Corrupted or missing localStorage; fall back to defaults.
     }
     return DEFAULT_CHALLENGES;
   });
@@ -289,8 +289,8 @@ export function EcoChallenges({ highestCategory }: Props) {
   useEffect(() => {
     try {
       localStorage.setItem("ecomindx_quests_v2", JSON.stringify(challenges));
-    } catch (e) {
-      console.warn("Failed to save quests to localStorage:", e);
+    } catch {
+      // localStorage write failure is non-critical; silently ignored.
     }
   }, [challenges]);
 

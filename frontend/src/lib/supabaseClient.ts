@@ -3,7 +3,7 @@
  *
  * Initialises the Supabase JS client with environment-provided credentials.
  * Falls back to placeholder values during development/build when environment
- * variables are not set, logging a warning to the console.
+ * variables are not set, falling back to placeholder values.
  *
  * @module supabaseClient
  */
@@ -25,9 +25,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "placeholder-k
 export const isSupabaseConfigured =
   supabaseUrl !== "https://placeholder-url.supabase.co" && supabaseAnonKey !== "placeholder-key";
 
-if (!isSupabaseConfigured) {
-  console.warn("Supabase URL or Anon Key is missing in environment variables. Using placeholders.");
-}
+// When isSupabaseConfigured is false, the AccountPanel displays a setup warning banner.
 
 /** The global Supabase client instance used by all API functions. */
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);

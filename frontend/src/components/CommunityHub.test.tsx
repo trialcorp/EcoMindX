@@ -179,7 +179,6 @@ describe("CommunityHub", () => {
   it("allows selecting category when submitting a tip and handles submit failure", async () => {
     const mockUser = { id: "user-1", email: "Anonymous Eco-Warrior@example.com" };
     const mockRejectShare = vi.fn().mockRejectedValue(new Error("Fail share"));
-    const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     render(
       <CommunityHub
@@ -210,12 +209,6 @@ describe("CommunityHub", () => {
         "Anonymous Eco-Warrior",
       );
     });
-
-    await waitFor(() => {
-      expect(consoleWarnSpy).toHaveBeenCalledWith("Failed to share tip:", expect.any(Error));
-    });
-
-    consoleWarnSpy.mockRestore();
   });
 
   it("renders loading community spinner when loading and leaderboard is empty", () => {
@@ -307,6 +300,75 @@ describe("CommunityHub", () => {
         "It is good",
         "Anonymous",
       );
+    });
+  });
+
+  it("renders more than 3 leaderboard users", () => {
+    const longLeaderboard = [
+      { user_id: "1", score: 100, isUser: false, name: "A" },
+      { user_id: "2", score: 200, isUser: false, name: "B" },
+      { user_id: "3", score: 300, isUser: false, name: "C" },
+      { user_id: "4", score: 400, isUser: false, name: "D" },
+    ] as unknown as LeaderboardEntry[];
+    render(
+      <CommunityHub
+        leaderboardUsers={longLeaderboard}
+        collectiveSaved={5000}
+        communityTips={[]}
+        loadingCommunity={false}
+        communityError={null}
+        user={null}
+        onShareTip={vi.fn()}
+        onDeleteTip={vi.fn()}
+        onSignInClick={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("#4")).toBeInTheDocument();
+  });
+
+  it("does not submit if description is missing but title is provided", async () => {
+    const mockUser = { id: "user-1" };
+    render(
+      <CommunityHub
+        leaderboardUsers={mockLeaderboard}
+        collectiveSaved={5000}
+        communityTips={mockTips}
+        loadingCommunity={false}
+        communityError={null}
+        user={mockUser as unknown as User}
+        onShareTip={mockOnShare}
+        onDeleteTip={mockOnDelete}
+        onSignInClick={vi.fn()}
+      />,
+    );
+    fireEvent.change(screen.getByLabelText(/Tip Title/), { target: { value: "New Tip" } });
+    fireEvent.click(screen.getByText("Publish Tip"));
+    await waitFor(() => {
+      expect(mockOnShare).not.toHaveBeenCalled();
+    });
+  });
+
+  it("does not submit if title is missing but description is provided", async () => {
+    const mockUser = { id: "user-1" };
+    render(
+      <CommunityHub
+        leaderboardUsers={mockLeaderboard}
+        collectiveSaved={5000}
+        communityTips={mockTips}
+        loadingCommunity={false}
+        communityError={null}
+        user={mockUser as unknown as User}
+        onShareTip={mockOnShare}
+        onDeleteTip={mockOnDelete}
+        onSignInClick={vi.fn()}
+      />,
+    );
+    fireEvent.change(screen.getByLabelText(/How does it help/), {
+      target: { value: "It is good" },
+    });
+    fireEvent.click(screen.getByText("Publish Tip"));
+    await waitFor(() => {
+      expect(mockOnShare).not.toHaveBeenCalled();
     });
   });
 });

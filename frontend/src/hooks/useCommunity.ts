@@ -36,8 +36,8 @@ export function useCommunity() {
       setLeaderboard(lb);
       setCollectiveSaved(saved);
       setTips(tps);
-    } catch (err: unknown) {
-      console.warn("Failed to load community hub data:", err);
+    } catch {
+      // Non-critical; user sees the communityError banner instead.
       setCommunityError("Could not load community data. Please try again.");
     } finally {
       setLoadingCommunity(false);

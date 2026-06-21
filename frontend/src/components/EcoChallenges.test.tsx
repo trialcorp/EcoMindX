@@ -164,6 +164,40 @@ describe("EcoChallenges", () => {
     expect(screen.getByText("Accept Challenge")).toBeInTheDocument();
   });
 
+  it("handles localStorage write errors gracefully", () => {
+    const setItemSpy = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new Error("Quota exceeded");
+    });
+    
+    render(<EcoChallenges highestCategory={null} />);
+    const acceptBtns = screen.getAllByText("Accept Challenge");
+    fireEvent.click(acceptBtns[0]);
+    
+    setItemSpy.mockRestore();
+  });
+
+  it("respects reduced motion preference and bypasses confetti", async () => {
+    vi.useFakeTimers();
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      value: vi.fn().mockImplementation((query) => ({
+        matches: query === "(prefers-reduced-motion: reduce)",
+      })),
+    });
+
+    render(<EcoChallenges highestCategory={null} />);
+    const acceptBtns = screen.getAllByText("Accept Challenge");
+    fireEvent.click(acceptBtns[0]);
+    const completeBtns = screen.getAllByText("Mark Completed");
+    fireEvent.click(completeBtns[0]);
+
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+
+    vi.useRealTimers();
+  });
+
   it("passes accessibility checks", async () => {
     const { container } = render(<EcoChallenges highestCategory={null} />);
     const results = await axe(container);

@@ -118,7 +118,7 @@ describe("AccountPanel", () => {
     expect(mockOnClaimHistory).toHaveBeenCalled();
   });
 
-  it("submits sign in form successfully", () => {
+  it("submits sign in form successfully", async () => {
     render(
       <AccountPanel
         user={null}
@@ -141,9 +141,12 @@ describe("AccountPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: "Sign In" }));
 
     expect(mockOnSignIn).toHaveBeenCalledWith("test@test.com", "password123");
+    await waitFor(() => {
+      expect(screen.getByLabelText("Email Address")).toHaveValue("");
+    });
   });
 
-  it("submits sign up form successfully", () => {
+  it("submits sign up form successfully", async () => {
     render(
       <AccountPanel
         user={null}
@@ -165,6 +168,9 @@ describe("AccountPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create Account" }));
 
     expect(mockOnSignUp).toHaveBeenCalledWith("new@test.com", "password123");
+    await waitFor(() => {
+      expect(screen.getByLabelText("Email Address")).toHaveValue("");
+    });
   });
 
   it("shows spinner when authLoading is true", () => {
@@ -205,7 +211,7 @@ describe("AccountPanel", () => {
     expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
   });
 
-  it("handles form submission exceptions gracefully", () => {
+  it("handles form submission exceptions gracefully", async () => {
     mockOnSignIn.mockRejectedValueOnce(new Error("auth fail"));
     render(
       <AccountPanel
@@ -228,7 +234,7 @@ describe("AccountPanel", () => {
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "password123" } });
     fireEvent.click(screen.getByRole("button", { name: "Sign In" }));
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(screen.getByText("auth fail")).toBeInTheDocument();
     });
   });
@@ -250,5 +256,24 @@ describe("AccountPanel", () => {
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();
+  });
+
+  it("shows error when email or password is empty", () => {
+    render(
+      <AccountPanel
+        user={null}
+        authLoading={false}
+        authError={null}
+        entries={[]}
+        saving={false}
+        userEmissions={null}
+        onSignIn={mockOnSignIn}
+        onSignUp={mockOnSignUp}
+        onSignOut={mockOnSignOut}
+        onClaimHistory={mockOnClaimHistory}
+      />,
+    );
+    fireEvent.submit(screen.getByRole("button", { name: "Sign In" }).closest("form")!);
+    expect(screen.getByText("Please provide both email and password.")).toBeInTheDocument();
   });
 });

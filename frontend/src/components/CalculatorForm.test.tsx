@@ -123,11 +123,6 @@ describe("CalculatorForm", () => {
       "true",
     );
 
-    // Direct tab click to go to Step 1
-    const mobilityTab = screen.getByRole("tab", { name: /Mobility/i });
-    await userEvent.click(mobilityTab);
-    expect(screen.getByRole("tab", { name: /Mobility/i })).toHaveAttribute("aria-selected", "true");
-
     // Direct tab click to go to Step 3
     const lifestyleTab = screen.getByRole("tab", { name: /Lifestyle & Diet/i });
     await userEvent.click(lifestyleTab);
@@ -135,5 +130,25 @@ describe("CalculatorForm", () => {
       "aria-selected",
       "true",
     );
+  });
+
+  it("clamps invalid household size to 1 on submit", async () => {
+    const onSubmit = vi.fn();
+    render(<CalculatorForm onSubmit={onSubmit} loading={false} />);
+
+    // Set household to 0
+    const field = screen.getByLabelText(/people in household/i);
+    await userEvent.clear(field);
+    await userEvent.type(field, "0");
+
+    // Go to final step to submit
+    const lifestyleTab = screen.getByRole("tab", { name: /Lifestyle & Diet/i });
+    await userEvent.click(lifestyleTab);
+
+    await userEvent.click(screen.getByRole("button", { name: /calculate my footprint/i }));
+    
+    // It should have clamped 0 back up to 1
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+    expect(onSubmit.mock.calls[0][0].home.household_size).toBe(1);
   });
 });

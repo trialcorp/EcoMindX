@@ -67,7 +67,7 @@ function computeConsumptionAnnualKg(c: CarbonInput["consumption"]): number {
  * @example
  * ```ts
  * const result = calculateFootprint(emptyInput());
- * console.log(result.total_annual_tonnes); // 2.5
+ * result.total_annual_tonnes; // => 2.5
  * ```
  */
 export function calculateFootprint(data: CarbonInput): FootprintResult {

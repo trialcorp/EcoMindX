@@ -23,8 +23,8 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, info: ErrorInfo): void {
-    console.error("[ErrorBoundary] Uncaught render error:", error, info.componentStack);
+  componentDidCatch(_error: Error, _info: ErrorInfo): void {
+    // Error is captured in state via getDerivedStateFromError and displayed in the fallback UI.
   }
 
   private handleReload = () => {

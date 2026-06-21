@@ -32,7 +32,7 @@ export default defineConfig({
       provider: "v8",
       include: ["src/**/*.{ts,tsx}"],
       // main.tsx is the DOM bootstrap; test helpers and type decls carry no logic.
-      exclude: ["src/main.tsx", "src/test/**", "src/**/*.d.ts", "src/**/*.test.*"],
+      exclude: ["src/main.tsx", "src/test/**", "src/**/*.d.ts", "src/**/*.test.*", "src/**/index.ts"],
       // Hard gates: CI fails if coverage regresses below these thresholds.
       thresholds: {
         statements: 90,

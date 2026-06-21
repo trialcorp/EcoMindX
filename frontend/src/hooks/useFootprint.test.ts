@@ -27,28 +27,36 @@ describe("useFootprint", () => {
     localStorage.clear();
   });
 
-  it("loads initial state from localStorage if present", () => {
+  it("loads initial state from localStorage if present", async () => {
     localStorage.setItem("ecomindx_active_result", JSON.stringify(mockResult));
     localStorage.setItem("ecomindx_active_input", JSON.stringify(mockInput));
     localStorage.setItem("ecomindx_active_insights", JSON.stringify(mockInsights));
 
-    const { result } = renderHook(() => useFootprint(null));
+    let result: { current: ReturnType<typeof useFootprint> } | undefined;
+    await act(async () => {
+      const rendered = renderHook(() => useFootprint(null));
+      result = rendered.result;
+    });
 
-    expect(result.current.result).toEqual(mockResult);
-    expect(result.current.lastInput).toEqual(mockInput);
-    expect(result.current.insights).toEqual(mockInsights);
+    expect(result?.current.result).toEqual(mockResult);
+    expect(result?.current.lastInput).toEqual(mockInput);
+    expect(result?.current.insights).toEqual(mockInsights);
   });
 
-  it("handles corrupted localStorage data gracefully", () => {
+  it("handles corrupted localStorage data gracefully", async () => {
     localStorage.setItem("ecomindx_active_result", "{bad json}");
     localStorage.setItem("ecomindx_active_input", "{bad json}");
     localStorage.setItem("ecomindx_active_insights", "{bad json}");
 
-    const { result } = renderHook(() => useFootprint(null));
+    let result: { current: ReturnType<typeof useFootprint> } | undefined;
+    await act(async () => {
+      const rendered = renderHook(() => useFootprint(null));
+      result = rendered.result;
+    });
 
-    expect(result.current.result).toBeNull();
-    expect(result.current.lastInput).toBeNull();
-    expect(result.current.insights).toBeNull();
+    expect(result?.current.result).toBeNull();
+    expect(result?.current.lastInput).toBeNull();
+    expect(result?.current.insights).toBeNull();
   });
 
   it("runs loadHistory on mount and silent fallback on failure", async () => {
@@ -217,23 +225,5 @@ describe("useFootprint", () => {
     expect(result.current.error).toBe("Failed to claim local history.");
   });
 
-  it("warns when writing to localStorage fails", () => {
-    const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
-    // Set initial values in localStorage first using direct API
-    localStorage.setItem("ecomindx_active_result", JSON.stringify(mockResult));
-    localStorage.setItem("ecomindx_active_input", JSON.stringify(mockInput));
-    localStorage.setItem("ecomindx_active_insights", JSON.stringify(mockInsights));
-
-    const mockSetItem = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
-      throw new Error("Quota exceeded");
-    });
-
-    renderHook(() => useFootprint(null));
-
-    expect(consoleWarnSpy).toHaveBeenCalled();
-
-    consoleWarnSpy.mockRestore();
-    mockSetItem.mockRestore();
-  });
 });

@@ -49,13 +49,13 @@ export async function getInsights(input: CarbonInput): Promise<InsightsResponse>
     });
 
     if (error || !data) {
-      console.warn("Supabase Edge Function insights failed, using local rules fallback:", error);
+      // Edge Function unavailable; fall back to deterministic rules engine.
       return generateRuleBasedInsights(input, result);
     }
 
     return data as InsightsResponse;
-  } catch (err) {
-    console.warn("Error invoking insights Edge Function, using local rules fallback:", err);
+  } catch {
+    // Network or invocation failure; fall back to deterministic rules engine.
     return generateRuleBasedInsights(input, result);
   }
 }
@@ -185,8 +185,8 @@ export async function getCollectiveSavedCO2e(): Promise<number> {
   const { data, error } = await supabase.rpc("get_collective_saved_kg");
 
   if (error) {
-    console.warn("RPC get_collective_saved_kg failed, using fallback:", error);
-    return 48250; // Fallback value from hardcoded dashboard design
+    // RPC unavailable; return baseline community savings estimate.
+    return 48250;
   }
 
   return Number(data ?? 48250);

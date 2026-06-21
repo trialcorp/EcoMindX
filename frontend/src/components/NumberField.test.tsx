@@ -81,4 +81,33 @@ describe("NumberField", () => {
     rerender(<NumberField id="n" label="Amount" max={100} value={20} onChange={() => {}} />);
     expect(input.value).toBe("20");
   });
+
+  it("handles NaN strings gracefully on blur", () => {
+    const onChange = vi.fn();
+    render(<NumberField id="test" label="Test" max={100} value={5} onChange={onChange} />);
+    const input = screen.getByLabelText("Test");
+    
+    fireEvent.change(input, { target: { value: "abc" } });
+    fireEvent.blur(input);
+    expect(onChange).toHaveBeenLastCalledWith(0);
+  });
+
+  it("handles household id special case for zero value", () => {
+    const onChange = vi.fn();
+    render(<NumberField id="household_size" label="Household" max={100} value={0} onChange={onChange} />);
+    const input = screen.getByLabelText("Household") as HTMLInputElement;
+    expect(input.value).toBe("0"); // does not turn into ""
+  });
+
+  it("handles range slider NaN gracefully", () => {
+    const onChange = vi.fn();
+    const { container } = render(<NumberField id="test2" label="Test2" max={100} value={5} onChange={onChange} />);
+    const rangeInput = container.querySelector('input[type="range"]');
+    
+    // Bypass JSDOM's strict HTML5 range sanitization to hit the fallback
+    Object.defineProperty(rangeInput, 'value', { get: () => "NaN" });
+    fireEvent.change(rangeInput!);
+    
+    expect(onChange).toHaveBeenCalledWith(0);
+  });
 });

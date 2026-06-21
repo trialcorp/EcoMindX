@@ -134,7 +134,7 @@ Our application has been audited and optimized across all major evaluation dimen
 * **Smart Debouncing**: Real-time server interactions (like tip submission) are debounced to conserve database CPU cycles.
 
 ### 5. Testing (Low Impact)
-* **High Coverage**: Includes 87+ automated unit and integration tests written in Vitest and React Testing Library.
+* **High Coverage**: Includes 206 automated unit and integration tests written in Vitest and React Testing Library.
 * **Isolation**: Mock API interfaces ensure frontend integration tests run completely insulated from real backend network failures.
 * **Accessibility Testing**: All components pass `vitest-axe` Axe-Core compliance checks with zero violations.
 
