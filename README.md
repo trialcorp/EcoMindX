@@ -18,7 +18,7 @@ This project was built to score 100/100 across all evaluation categories:
 | **Code Quality** | Clean modular React architecture (extracted from monolith). Strict TypeScript typing, ESLint checks, Prettier formatting, React Error Boundaries, and zero `console.error` leakage. |
 | **Security** | Privacy-by-design (anonymous-first architecture). Supabase Row Level Security (RLS). Comprehensive input sanitization. Strict CSP headers. API keys hidden behind Edge Functions. See [SECURITY.md](SECURITY.md). |
 | **Efficiency** | Client-side chunking (`manualChunks`), debounced API calls, optimized Vite build, CSS `content-visibility`, edge computing for AI orchestration, and lightweight footprint (< 10MB total). |
-| **Testing** | 64 automated tests covering gamification logic, carbon math algorithms, input boundary checks, and full integration flows. >90% code coverage. |
+| **Testing** | 87 automated tests covering gamification logic, carbon math algorithms, input boundary checks, and full integration flows. >90% code coverage. |
 | **Accessibility (a11y)** | Passes `vitest-axe` with zero violations. Full keyboard navigation, `prefers-reduced-motion` support, high-contrast theming, ARIA landmarks, and 44x44px minimum touch targets. |
 
 ---

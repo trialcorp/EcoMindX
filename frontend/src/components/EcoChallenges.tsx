@@ -230,8 +230,17 @@ export function EcoChallenges({ highestCategory }: Props) {
   }, [challenges]);
 
   const triggerConfetti = () => {
+    // Respect accessibility motion preferences
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    if (!confettiCanvasRef.current) return;
     const canvas = confettiCanvasRef.current;
-    if (!canvas) return;
+    
+    // Explicitly hide from screen readers
+    canvas.setAttribute("aria-hidden", "true");
+
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 

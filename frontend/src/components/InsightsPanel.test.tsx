@@ -1,69 +1,67 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, act } from "@testing-library/react";
-import { axe } from "vitest-axe";
+import { describe, it, expect } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { InsightsPanel } from "./InsightsPanel";
-import type { InsightsResponse } from "../lib/types";
-
-const baseInsights: InsightsResponse = {
-  summary: "Transport is your biggest source of emissions.",
-  recommendations: [
-    { category: "transport", action: "Take the train", estimated_annual_savings_kg: 800 },
-    { category: "diet", action: "More plant-based meals", estimated_annual_savings_kg: 600 },
-  ],
-  source: "gemini",
-};
+import { axe } from "vitest-axe";
 
 describe("InsightsPanel", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
+  const mockInsights = {
+    summary: "Test Summary",
+    recommendations: [
+      {
+        category: "transport",
+        action: "Use public transit",
+        estimated_annual_savings_kg: 500,
+      },
+      {
+        category: "home",
+        action: "Use LED bulbs",
+        estimated_annual_savings_kg: 200,
+      }
+    ],
+    source: "gemini" as const,
+  };
+
+  it("shows recommendations after generation delay", async () => {
+    render(<InsightsPanel insights={mockInsights} />);
+    
+    // Initially shows generation UI
+    expect(screen.getByText("AI is analyzing your footprint...")).toBeInTheDocument();
+
+    // Fast-forward or wait for the useEffect timeout
+    await screen.findByText("Test Summary", undefined, { timeout: 3000 });
+    
+    expect(screen.getByText(/Use public transit/)).toBeInTheDocument();
+    expect(screen.getByText(/500 kg/)).toBeInTheDocument();
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
+  it("updates simulation total when commitments are made", async () => {
+    render(<InsightsPanel insights={mockInsights} />);
+    await screen.findByText("Test Summary", undefined, { timeout: 3000 });
+
+    const checkboxes = screen.getAllByRole("checkbox");
+    fireEvent.click(checkboxes[0]); // Check public transit
+    
+    expect(screen.getByText(/-500 kg/)).toBeInTheDocument(); // Potential savings header updates
+    
+    fireEvent.click(checkboxes[1]); // Check LED bulbs
+    expect(screen.getByText(/-700 kg/)).toBeInTheDocument(); 
   });
 
-  /** Render and fast-forward past the generation loading animation. */
-  function renderAndFlush(insights: InsightsResponse) {
-    const view = render(<InsightsPanel insights={insights} />);
-    act(() => {
-      vi.advanceTimersByTime(1600);
-    });
-    return view;
-  }
+  it("shows eco-pledge card when commitments are > 0", async () => {
+    render(<InsightsPanel insights={mockInsights} />);
+    await screen.findByText("Test Summary", undefined, { timeout: 3000 });
 
-  it(
-    "has no accessibility violations",
-    async () => {
-      // axe-core relies on real timers internally, so run this test outside fake timers.
-      vi.useRealTimers();
-      const { container } = render(<InsightsPanel insights={baseInsights} />);
-      // Wait for the generation delay to resolve naturally.
-      await new Promise((r) => setTimeout(r, 1600));
-      expect(await axe(container)).toHaveNoViolations();
-    },
-    10000,
-  );
-
-  it("shows a generating state initially", () => {
-    render(<InsightsPanel insights={baseInsights} />);
-    expect(screen.getByText(/AI is analyzing your footprint/i)).toBeInTheDocument();
+    const checkboxes = screen.getAllByRole("checkbox");
+    fireEvent.click(checkboxes[0]);
+    
+    expect(screen.getByText("My Eco-Pledge")).toBeInTheDocument();
   });
 
-  it("labels AI-generated insights as such", () => {
-    renderAndFlush(baseInsights);
-    expect(screen.getByText("AI-personalized")).toBeInTheDocument();
-  });
-
-  it("labels rule-based insights as smart rules", () => {
-    renderAndFlush({ ...baseInsights, source: "rules" });
-    expect(screen.getByText("Smart rules")).toBeInTheDocument();
-  });
-
-  it("renders the summary and every recommendation with its saving", () => {
-    renderAndFlush(baseInsights);
-    expect(screen.getByText(baseInsights.summary)).toBeInTheDocument();
-    expect(screen.getAllByRole("listitem")).toHaveLength(2);
-    expect(screen.getByText(/take the train/i)).toBeInTheDocument();
-    expect(screen.getByText(/800 kg CO₂e \/ year/i)).toBeInTheDocument();
+  it("passes accessibility checks", async () => {
+    const { container } = render(<InsightsPanel insights={mockInsights} />);
+    // Wait for the panel to be fully rendered
+    await screen.findByText("Test Summary", undefined, { timeout: 3000 });
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
   });
 });

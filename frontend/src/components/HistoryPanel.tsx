@@ -5,7 +5,7 @@ interface Props {
   entries: Entry[];
 }
 
-/** Tracking history ledger: lists past calculation entries and trends. */
+/** Tracking history ledger: lists past calculation entries and trends with a sparkline chart. */
 export function HistoryPanel({ entries }: Props) {
   if (entries.length === 0) {
     return (
@@ -37,6 +37,31 @@ export function HistoryPanel({ entries }: Props) {
   const latest = entries[0].result.total_annual_tonnes;
   const previous = entries.length > 1 ? entries[1].result.total_annual_tonnes : null;
   const trend = previous === null ? null : latest - previous;
+
+  // Prepare data for sparkline chart (chronological order)
+  const chartData = [...entries].reverse();
+  const maxEmissions = Math.max(...chartData.map((e) => e.result.total_annual_tonnes));
+  const minEmissions = Math.min(0, ...chartData.map((e) => e.result.total_annual_tonnes));
+  
+  // Chart dimensions
+  const svgWidth = 800;
+  const svgHeight = 200;
+  const paddingX = 40;
+  const paddingY = 40;
+  const graphWidth = svgWidth - 2 * paddingX;
+  const graphHeight = svgHeight - 2 * paddingY;
+
+  // Scale functions
+  const xScale = (index: number) => paddingX + (index / Math.max(1, chartData.length - 1)) * graphWidth;
+  const yScale = (val: number) => paddingY + graphHeight - ((val - minEmissions) / Math.max(1, maxEmissions - minEmissions)) * graphHeight;
+
+  // Generate path string
+  const pathD = chartData
+    .map((e, i) => `${i === 0 ? "M" : "L"} ${xScale(i)} ${yScale(e.result.total_annual_tonnes)}`)
+    .join(" ");
+
+  // Generate fill path (area under the curve)
+  const fillPathD = `${pathD} L ${xScale(chartData.length - 1)} ${paddingY + graphHeight} L ${paddingX} ${paddingY + graphHeight} Z`;
 
   return (
     <section className="card" aria-labelledby="history-heading">
@@ -74,6 +99,50 @@ export function HistoryPanel({ entries }: Props) {
           ) : (
             <span style={{ fontWeight: 700 }}>No change since your last entry.</span>
           )}
+        </div>
+      )}
+
+      {chartData.length > 1 && (
+        <div className="trend-chart-container" aria-label="Line chart showing your emissions trend over time">
+          <h3 className="trend-chart-title">Emissions Trend</h3>
+          <div className="trend-chart-svg-wrapper">
+            <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="trend-chart-svg" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.4" />
+                  <stop offset="100%" stopColor="var(--primary)" stopOpacity="0.0" />
+                </linearGradient>
+              </defs>
+              
+              {/* Grid Lines */}
+              <line x1={paddingX} y1={paddingY} x2={svgWidth - paddingX} y2={paddingY} className="chart-grid-line" />
+              <line x1={paddingX} y1={paddingY + graphHeight / 2} x2={svgWidth - paddingX} y2={paddingY + graphHeight / 2} className="chart-grid-line" />
+              <line x1={paddingX} y1={paddingY + graphHeight} x2={svgWidth - paddingX} y2={paddingY + graphHeight} className="chart-grid-line" />
+
+              {/* Data Area */}
+              <path d={fillPathD} fill="url(#chartGradient)" />
+              
+              {/* Data Line */}
+              <path d={pathD} fill="none" stroke="var(--primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+
+              {/* Data Points */}
+              {chartData.map((e, i) => (
+                <circle 
+                  key={e.id}
+                  cx={xScale(i)} 
+                  cy={yScale(e.result.total_annual_tonnes)} 
+                  r="5" 
+                  className="chart-point"
+                >
+                  <title>{formatDate(e.created_at)}: {formatTonnes(e.result.total_annual_tonnes)} t</title>
+                </circle>
+              ))}
+
+              {/* Labels */}
+              <text x={10} y={paddingY + 5} className="chart-label">Max</text>
+              <text x={10} y={paddingY + graphHeight} className="chart-label">0</text>
+            </svg>
+          </div>
         </div>
       )}
 

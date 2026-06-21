@@ -77,6 +77,11 @@ export function ResultBreakdown({ result, input }: Props) {
           <span className="label">Annual Emissions</span>
           <span className={`value total ${overTarget ? "over" : "under"}`}>
             {formatTonnes(result.total_annual_tonnes)} CO₂e
+            {overTarget ? (
+              <span className="colorblind-indicator over" aria-label="Above target">↑</span>
+            ) : (
+              <span className="colorblind-indicator under" aria-label="Below target">✓</span>
+            )}
           </span>
           <span className="sub">tonnes per year</span>
         </div>
@@ -85,6 +90,11 @@ export function ResultBreakdown({ result, input }: Props) {
           <span className="label">vs Sustainable Target</span>
           <span className={`value ${overTarget ? "over" : "under"}`}>
             {result.comparison.ratio_to_sustainable_target.toFixed(1)}×
+            {overTarget ? (
+              <span className="colorblind-indicator over" aria-label="Above target">↑</span>
+            ) : (
+              <span className="colorblind-indicator under" aria-label="Below target">✓</span>
+            )}
           </span>
           <span className="sub">
             Target: {formatTonnes(result.comparison.sustainable_target_annual_kg / 1000)} CO₂e

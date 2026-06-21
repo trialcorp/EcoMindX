@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { CalculatorForm } from "./components/CalculatorForm";
 import { AnalyticsTab } from "./components/AnalyticsTab";
 import { InsightsPanel } from "./components/InsightsPanel";
@@ -7,6 +7,8 @@ import { HistoryPanel } from "./components/HistoryPanel";
 import { CommunityHub } from "./components/CommunityHub";
 import { EcoChallenges } from "./components/EcoChallenges";
 import { AccountPanel } from "./components/AccountPanel";
+import { useAuth } from "./hooks/useAuth";
+import { useCommunity } from "./hooks/useCommunity";
 import { useFootprint } from "./hooks/useFootprint";
 
 type TabType =
@@ -22,9 +24,22 @@ type TabType =
  * EcoMindX Application Shell
  *
  * Orchestrates navigation, layout, and delegates each tab to a focused component.
- * All business logic lives in `useFootprint` and the individual tab components.
+ * Business logic is split across three hooks: useAuth, useCommunity, useFootprint.
  */
 export default function App() {
+  const { user, authLoading, authError, signIn, signUp, signOut } = useAuth();
+
+  const {
+    leaderboard,
+    collectiveSaved,
+    tips: communityTips,
+    loadingCommunity,
+    communityError,
+    loadCommunityData,
+    shareTip,
+    deleteTip,
+  } = useCommunity();
+
   const {
     result,
     lastInput,
@@ -36,21 +51,8 @@ export default function App() {
     status,
     calculate,
     save,
-    user,
-    authLoading,
-    authError,
-    signIn,
-    signUp,
-    signOut,
     claimHistory,
-    leaderboard,
-    collectiveSaved,
-    tips: communityTips,
-    loadingCommunity,
-    communityError,
-    shareTip,
-    deleteTip,
-  } = useFootprint();
+  } = useFootprint(user);
 
   const [activeTab, setActiveTab] = useState<TabType>("calculator");
 
@@ -61,6 +63,22 @@ export default function App() {
     }
   }, [result]);
 
+  // Load community data when community tab is first activated (lazy loading)
+  const [communityLoaded, setCommunityLoaded] = useState(false);
+  useEffect(() => {
+    if (activeTab === "community" && !communityLoaded) {
+      void loadCommunityData();
+      setCommunityLoaded(true);
+    }
+  }, [activeTab, communityLoaded, loadCommunityData]);
+
+  // Also reload community data when user auth changes and tab is visible
+  useEffect(() => {
+    if (communityLoaded) {
+      void loadCommunityData();
+    }
+  }, [user, communityLoaded, loadCommunityData]);
+
   // Dynamically calculate user ranking on the leaderboard based on emissions
   const userEmissions = result
     ? result.total_annual_tonnes
@@ -69,22 +87,24 @@ export default function App() {
       : null;
 
   const leaderboardUsers = leaderboard.map((item) => ({
-    name: item.display_name,
+    display_name: item.display_name,
     score: item.score,
     isUser: user ? item.user_id === user.id : false,
-    userId: item.user_id,
+    user_id: item.user_id,
+    name: item.display_name,
   }));
 
   if (userEmissions !== null) {
     const alreadyExists = leaderboardUsers.some(
-      (item) => item.isUser || (user && item.userId === user.id),
+      (item) => item.isUser || (user && item.user_id === user.id),
     );
     if (!alreadyExists) {
       leaderboardUsers.push({
-        name: user?.email ? `${user.email.split("@")[0]} (You)` : "You",
+        display_name: user?.email ? `${user.email.split("@")[0]} (You)` : "You",
         score: Number(userEmissions.toFixed(2)),
         isUser: true,
-        userId: user?.id || "anonymous",
+        user_id: user?.id || "anonymous",
+        name: user?.email ? `${user.email.split("@")[0]} (You)` : "You",
       });
     }
   }
@@ -92,13 +112,13 @@ export default function App() {
   leaderboardUsers.sort((a, b) => a.score - b.score);
 
   // Compute highest emission category from result
-  const getHighestEmissionCategory = () => {
+  const getHighestEmissionCategory = useCallback(() => {
     if (!result || !result.breakdown_kg) return null;
     const { transport, home, diet, consumption } = result.breakdown_kg;
     const entriesList = Object.entries({ transport, home, diet, consumption });
     entriesList.sort((a, b) => b[1] - a[1]);
     return entriesList[0][0];
-  };
+  }, [result]);
 
   const highestCategory = getHighestEmissionCategory();
 
@@ -109,7 +129,7 @@ export default function App() {
     desc: string,
     authorName: string,
   ) => {
-    await shareTip(category, title, desc, authorName);
+    await shareTip(category, title, desc, authorName, user?.id);
   };
 
   const handleDeleteTip = async (tipId: string) => {
@@ -230,11 +250,6 @@ export default function App() {
         </aside>
 
         <main id="main">
-          {/* 1. Carbon Calculator */}
-          <div className={activeTab === "calculator" ? "tab-content" : "tab-content hidden"}>
-            <CalculatorForm onSubmit={calculate} loading={loading} />
-          </div>
-
           <div role="alert" aria-live="assertive">
             {error && <p className="error">{error}</p>}
           </div>
@@ -242,29 +257,29 @@ export default function App() {
             {status}
           </p>
 
-          {/* 2. Sustain Analytics */}
-          <div className={activeTab === "analytics" ? "tab-content" : "tab-content hidden"}>
-            {activeTab === "analytics" && (
-              <AnalyticsTab
-                result={result}
-                lastInput={lastInput}
-                saving={saving}
-                onSave={save}
-              />
-            )}
-          </div>
+          {/* Conditionally render tabs — only the active tab is mounted */}
+          {activeTab === "calculator" && (
+            <CalculatorForm onSubmit={calculate} loading={loading} />
+          )}
 
-          {/* 3. AI Action Plan */}
-          <div className={activeTab === "insights" ? "tab-content" : "tab-content hidden"}>
-            {result && insights ? (
+          {activeTab === "analytics" && (
+            <AnalyticsTab
+              result={result}
+              lastInput={lastInput}
+              saving={saving}
+              onSave={save}
+            />
+          )}
+
+          {activeTab === "insights" && (
+            result && insights ? (
               <InsightsPanel insights={insights} />
             ) : (
               <InsightsEmptyState />
-            )}
-          </div>
+            )
+          )}
 
-          {/* 4. Community Hub */}
-          <div className={activeTab === "community" ? "tab-content" : "tab-content hidden"}>
+          {activeTab === "community" && (
             <CommunityHub
               leaderboardUsers={leaderboardUsers}
               collectiveSaved={collectiveSaved}
@@ -275,15 +290,13 @@ export default function App() {
               onShareTip={handleShareTip}
               onDeleteTip={handleDeleteTip}
             />
-          </div>
+          )}
 
-          {/* 5. Eco-Challenges */}
-          <div className={activeTab === "challenges" ? "tab-content" : "tab-content hidden"}>
+          {activeTab === "challenges" && (
             <EcoChallenges highestCategory={highestCategory} />
-          </div>
+          )}
 
-          {/* 6. My Account */}
-          <div className={activeTab === "account" ? "tab-content" : "tab-content hidden"}>
+          {activeTab === "account" && (
             <AccountPanel
               user={user}
               authLoading={authLoading}
@@ -296,12 +309,11 @@ export default function App() {
               onSignOut={signOut}
               onClaimHistory={claimHistory}
             />
-          </div>
+          )}
 
-          {/* 7. History Ledger */}
-          <div className={activeTab === "history" ? "tab-content" : "tab-content hidden"}>
+          {activeTab === "history" && (
             <HistoryPanel entries={entries} />
-          </div>
+          )}
         </main>
       </div>
     </>

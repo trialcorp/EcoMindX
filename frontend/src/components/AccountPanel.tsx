@@ -43,8 +43,8 @@ export function AccountPanel({
       setLocalAuthError("Please provide both email and password.");
       return;
     }
-    if (password.length < 6) {
-      setLocalAuthError("Password must be at least 6 characters.");
+    if (password.length < 8) {
+      setLocalAuthError("Password must be at least 8 characters.");
       return;
     }
     try {
