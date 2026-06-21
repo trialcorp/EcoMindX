@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { calculateFootprint } from "./calculator";
-import type { CarbonInput, FootprintResult } from "./types";
+import type { CarbonInput } from "../types";
 
 describe("Carbon Calculator Engine", () => {
   const baseInput: CarbonInput = {

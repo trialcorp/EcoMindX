@@ -44,18 +44,7 @@ export function NumberField({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
-  const handleInputChange = (valStr: string) => {
-    setInputValue(valStr);
 
-    if (valStr === "") {
-      onChange(0);
-    } else {
-      const next = Number(valStr);
-      if (!Number.isNaN(next)) {
-        onChange(next);
-      }
-    }
-  };
 
   const handleBlur = () => {
     // Revert/format local state to the official number value on blur (e.g. converts empty back to "0")

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { LeaderboardEntry, CommunityTip } from "../lib/types";
+import type { CommunityTip } from "../lib/types";
 import type { User } from "@supabase/supabase-js";
 
 interface Props {
