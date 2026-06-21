@@ -283,6 +283,37 @@ fieldset {
   margin: 0 0 1.5rem 0;
   animation: slideIn 0.3s ease-out;
 }
+
+/* Step Panel Grid Transition */
+.step-panel-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.step-panel-wrapper.active {
+  grid-template-rows: 1fr;
+}
+
+.step-panel {
+  overflow: hidden;
+}
+
+.step-panel > fieldset {
+  min-height: 0; /* Necessary for grid collapse */
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.4s;
+  opacity: 0;
+  transform: translateY(10px);
+  visibility: hidden;
+  animation: none; /* Disable default slideIn for these specific fieldsets */
+}
+
+.step-panel-wrapper.active .step-panel > fieldset {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+  transition-delay: 0.1s;
+}
 legend {
   font-family: var(--font-display);
   font-size: 1.2rem;

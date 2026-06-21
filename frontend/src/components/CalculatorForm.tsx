@@ -102,12 +102,13 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
       </div>
 
       {/* Step 1: Transport & Mobility */}
-      <div
-        id="step-transport"
-        className={step === 1 ? "step-panel" : "step-panel hidden"}
-        role="tabpanel"
-        aria-labelledby="step1-tab"
-      >
+      <div className={`step-panel-wrapper ${step === 1 ? "active" : ""}`}>
+        <div
+          id="step-transport"
+          className="step-panel"
+          role="tabpanel"
+          aria-labelledby="step1-tab"
+        >
         <fieldset>
           <legend>Transport & Mobility</legend>
           <NumberField
@@ -155,15 +156,17 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
             onChange={(v) => patchTransport({ long_haul_flights_per_year: v })}
           />
         </fieldset>
+        </div>
       </div>
 
       {/* Step 2: Home Energy */}
-      <div
-        id="step-home"
-        className={step === 2 ? "step-panel" : "step-panel hidden"}
-        role="tabpanel"
-        aria-labelledby="step2-tab"
-      >
+      <div className={`step-panel-wrapper ${step === 2 ? "active" : ""}`}>
+        <div
+          id="step-home"
+          className="step-panel"
+          role="tabpanel"
+          aria-labelledby="step2-tab"
+        >
         <fieldset>
           <legend>Home Energy</legend>
           <NumberField
@@ -191,15 +194,17 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
             onChange={(v) => patchHome({ household_size: v })}
           />
         </fieldset>
+        </div>
       </div>
 
       {/* Step 3: Diet & Consumption */}
-      <div
-        id="step-lifestyle"
-        className={step === 3 ? "step-panel" : "step-panel hidden"}
-        role="tabpanel"
-        aria-labelledby="step3-tab"
-      >
+      <div className={`step-panel-wrapper ${step === 3 ? "active" : ""}`}>
+        <div
+          id="step-lifestyle"
+          className="step-panel"
+          role="tabpanel"
+          aria-labelledby="step3-tab"
+        >
         <fieldset>
           <legend>Diet &amp; consumption</legend>
           <div className="field">
@@ -231,6 +236,7 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
             onChange={(v) => patchConsumption({ waste_kg_per_week: v })}
           />
         </fieldset>
+      </div>
       </div>
 
       {/* Wizard Footer Controls */}
