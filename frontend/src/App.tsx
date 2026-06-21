@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { CalculatorForm } from "./components/CalculatorForm";
 import { ResultBreakdown } from "./components/ResultBreakdown";
 import { InsightsPanel } from "./components/InsightsPanel";
+import { InsightsEmptyState } from "./components/InsightsEmptyState";
 import { HistoryPanel } from "./components/HistoryPanel";
 import { useFootprint } from "./hooks/useFootprint";
 import { isSupabaseConfigured } from "./lib/supabaseClient";
@@ -872,37 +873,7 @@ export default function App() {
             {result && insights ? (
               <InsightsPanel insights={insights} />
             ) : (
-              <div className="card" style={{ textAlign: "center", padding: "3rem 2rem" }}>
-                <svg
-                  width="64"
-                  height="64"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  style={{ color: "var(--muted)", marginBottom: "1rem" }}
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9.813 15.904L9 21m0-12h.01M21 12h-6m-6 0H3m12.938-3.097L15 3m-9 9.904L5 15m13.062-7.904l.938-3"
-                  />
-                </svg>
-                <h2
-                  style={{
-                    border: "none",
-                    padding: 0,
-                    margin: "0 0 0.5rem 0",
-                    justifyContent: "center",
-                  }}
-                >
-                  No Insights Available
-                </h2>
-                <p style={{ color: "var(--muted)", margin: 0 }}>
-                  Calculate your carbon footprint first to generate personalized AI recommendations.
-                </p>
-              </div>
+              <InsightsEmptyState />
             )}
           </div>
 
