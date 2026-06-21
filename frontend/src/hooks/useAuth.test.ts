@@ -192,4 +192,33 @@ describe("useAuth", () => {
     });
     expect(hookResult?.current.authLoading).toBe(false);
   });
+
+  it("aborts updates if unmounted during getSession", async () => {
+    mockGetSession.mockImplementation(
+      () => new Promise((resolve) => setTimeout(() => resolve({ data: { session: { user: { id: "user-late" } } } }), 50))
+    );
+    const { unmount } = renderHook(() => useAuth());
+    unmount();
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  });
+
+  it("aborts updates if unmounted during getSession error", async () => {
+    mockGetSession.mockImplementation(
+      () => new Promise((_, reject) => setTimeout(() => reject(new Error("late error")), 50))
+    );
+    const { unmount } = renderHook(() => useAuth());
+    unmount();
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  });
+
+  it("aborts updates if unmounted before auth state change", async () => {
+    let changeCallback: ((event: string, session: { user: { id: string } }) => void) | undefined;
+    mockOnAuthStateChange.mockImplementation((cb: (event: string, session: { user: { id: string } }) => void) => {
+      changeCallback = cb;
+      return { data: { subscription: { unsubscribe: vi.fn() } } };
+    });
+    const { unmount } = renderHook(() => useAuth());
+    unmount();
+    if (changeCallback) changeCallback("SIGNED_IN", { user: { id: "user-late" } });
+  });
 });

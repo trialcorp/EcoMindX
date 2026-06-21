@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { CommunityHub } from "./CommunityHub";
 import { axe } from "vitest-axe";
 import type { User } from "@supabase/supabase-js";
+import type { LeaderboardEntry } from "../lib/types";
 
 describe("CommunityHub", () => {
   beforeEach(() => {
@@ -232,5 +233,80 @@ describe("CommunityHub", () => {
       />,
     );
     expect(screen.getByText("Loading community data...")).toBeInTheDocument();
+  });
+
+  it("does not submit if title or description is missing", async () => {
+    const mockUser = { id: "user-1" };
+    render(
+      <CommunityHub
+        leaderboardUsers={mockLeaderboard}
+        collectiveSaved={5000}
+        communityTips={mockTips}
+        loadingCommunity={false}
+        communityError={null}
+        user={mockUser as unknown as User}
+        onShareTip={mockOnShare}
+        onDeleteTip={mockOnDelete}
+        onSignInClick={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("Publish Tip"));
+
+    await waitFor(() => {
+      expect(mockOnShare).not.toHaveBeenCalled();
+    });
+  });
+
+  it("renders anonymous leaderboard user gracefully", () => {
+    const anonymousLeaderboard = [
+      { score: 1000, isUser: false } as unknown as LeaderboardEntry,
+    ];
+    render(
+      <CommunityHub
+        leaderboardUsers={anonymousLeaderboard}
+        collectiveSaved={5000}
+        communityTips={mockTips}
+        loadingCommunity={false}
+        communityError={null}
+        user={null}
+        onShareTip={mockOnShare}
+        onDeleteTip={mockOnDelete}
+        onSignInClick={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("1000.0 t")).toBeInTheDocument();
+  });
+
+  it("submits as Anonymous when user has no email", async () => {
+    const mockUser = { id: "user-no-email" };
+    render(
+      <CommunityHub
+        leaderboardUsers={mockLeaderboard}
+        collectiveSaved={5000}
+        communityTips={mockTips}
+        loadingCommunity={false}
+        communityError={null}
+        user={mockUser as unknown as User}
+        onShareTip={mockOnShare}
+        onDeleteTip={mockOnDelete}
+        onSignInClick={vi.fn()}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText(/Tip Title/), { target: { value: "New Tip" } });
+    fireEvent.change(screen.getByLabelText(/How does it help/), {
+      target: { value: "It is good" },
+    });
+    fireEvent.click(screen.getByText("Publish Tip"));
+
+    await waitFor(() => {
+      expect(mockOnShare).toHaveBeenCalledWith(
+        "home",
+        "New Tip",
+        "It is good",
+        "Anonymous",
+      );
+    });
   });
 });

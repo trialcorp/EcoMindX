@@ -163,6 +163,19 @@ describe("api client", () => {
     expect(mockEq).toHaveBeenCalledWith("device_id", "dev-abc12345");
   });
 
+  it("returns empty array when listEntries data is null", async () => {
+    const mockLimit = vi.fn().mockResolvedValue({
+      data: null,
+      error: null,
+    });
+    const mockOrder = vi.fn().mockReturnValue({ limit: mockLimit });
+    const mockEq = vi.fn().mockReturnValue({ order: mockOrder });
+    mockSelect.mockReturnValue({ eq: mockEq });
+
+    const res = await api.listEntries("dev-abc12345");
+    expect(res).toEqual([]);
+  });
+
   it("throws when history cannot be loaded", async () => {
     const mockLimit = vi.fn().mockResolvedValue({
       data: null,
@@ -264,6 +277,17 @@ describe("api client", () => {
       expect(mockOrderLocal).toHaveBeenCalledWith("score", { ascending: true });
     });
 
+    it("returns empty array when leaderboard data is null", async () => {
+      const mockOrderLocal = vi.fn().mockResolvedValue({
+        data: null,
+        error: null,
+      });
+      mockSelect.mockReturnValue({ order: mockOrderLocal });
+
+      const res = await api.listLeaderboard();
+      expect(res).toEqual([]);
+    });
+
     it("throws error when loading leaderboard fails", async () => {
       const mockOrderLocal = vi.fn().mockResolvedValue({
         data: null,
@@ -282,6 +306,12 @@ describe("api client", () => {
       const res = await api.getCollectiveSavedCO2e();
       expect(res).toBe(99999);
       expect(mockRpc).toHaveBeenCalledWith("get_collective_saved_kg");
+    });
+
+    it("returns fallback value when RPC data is null without error", async () => {
+      mockRpc.mockResolvedValue({ data: null, error: null });
+      const res = await api.getCollectiveSavedCO2e();
+      expect(res).toBe(48250);
     });
 
     it("returns fallback value and warns when RPC fails", async () => {
@@ -303,6 +333,17 @@ describe("api client", () => {
       const res = await api.listTips();
       expect(res).toEqual([{ id: "t1", title: "Tip 1", category: "home" }]);
       expect(mockOrderLocal).toHaveBeenCalledWith("created_at", { ascending: false });
+    });
+
+    it("returns empty array when listTips data is null", async () => {
+      const mockOrderLocal = vi.fn().mockResolvedValue({
+        data: null,
+        error: null,
+      });
+      mockSelect.mockReturnValue({ order: mockOrderLocal });
+
+      const res = await api.listTips();
+      expect(res).toEqual([]);
     });
 
     it("throws error when listing tips fails", async () => {
