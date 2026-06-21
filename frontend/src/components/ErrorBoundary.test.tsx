@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { axe } from "vitest-axe";
 import { ErrorBoundary } from "./ErrorBoundary";
@@ -16,10 +17,13 @@ describe("ErrorBoundary", () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
-  it("renders the fallback UI when a child throws an error", () => {
+  it("renders the fallback UI when a child throws an error and reload button works", async () => {
     // Suppress console.error in this test to avoid polluting the test output
     const originalError = console.error;
     console.error = () => {};
+
+    const reloadMock = vi.fn();
+    vi.stubGlobal("location", { reload: reloadMock });
 
     const ThrowingChild = () => {
       throw new Error("Test crash");
@@ -34,9 +38,15 @@ describe("ErrorBoundary", () => {
     expect(screen.getByRole("alert")).toBeInTheDocument();
     expect(screen.getByText("Something went wrong")).toBeInTheDocument();
     expect(screen.getByText("Test crash")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Reload Page" })).toBeInTheDocument();
+    
+    const reloadBtn = screen.getByRole("button", { name: "Reload Page" });
+    expect(reloadBtn).toBeInTheDocument();
+    await userEvent.click(reloadBtn);
+    expect(reloadMock).toHaveBeenCalledTimes(1);
 
-    // Restore console.error
+    // Restore console.error and location stub
     console.error = originalError;
+    vi.unstubAllGlobals();
   });
 });
+

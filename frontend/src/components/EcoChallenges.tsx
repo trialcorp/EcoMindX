@@ -506,7 +506,6 @@ export function EcoChallenges({ highestCategory }: Props) {
         <div className="challenges-grid">
           {challenges
             .filter((quest) => {
-              if (questFilter === "all") return true;
               if (questFilter === "active") return quest.status === "accepted";
               if (questFilter === "completed") return quest.status === "completed";
               if (questFilter === "recommended") return quest.category === highestCategory;

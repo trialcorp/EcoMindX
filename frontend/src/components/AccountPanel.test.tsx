@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { AccountPanel } from "./AccountPanel";
 import { axe } from "vitest-axe";
 import type { User } from "@supabase/supabase-js";
@@ -116,6 +116,117 @@ describe("AccountPanel", () => {
     expect(screen.getByText("Sync Local History")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Sync History"));
     expect(mockOnClaimHistory).toHaveBeenCalled();
+  });
+
+  it("submits sign in form successfully", () => {
+    render(
+      <AccountPanel
+        user={null}
+        authLoading={false}
+        authError={null}
+        entries={[]}
+        saving={false}
+        userEmissions={null}
+        onSignIn={mockOnSignIn}
+        onSignUp={mockOnSignUp}
+        onSignOut={mockOnSignOut}
+        onClaimHistory={mockOnClaimHistory}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText("Email Address"), { target: { value: "test@test.com" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "password123" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sign In" }));
+
+    expect(mockOnSignIn).toHaveBeenCalledWith("test@test.com", "password123");
+  });
+
+  it("submits sign up form successfully", () => {
+    render(
+      <AccountPanel
+        user={null}
+        authLoading={false}
+        authError={null}
+        entries={[]}
+        saving={false}
+        userEmissions={null}
+        onSignIn={mockOnSignIn}
+        onSignUp={mockOnSignUp}
+        onSignOut={mockOnSignOut}
+        onClaimHistory={mockOnClaimHistory}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("Register"));
+    fireEvent.change(screen.getByLabelText("Email Address"), { target: { value: "new@test.com" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "password123" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create Account" }));
+
+    expect(mockOnSignUp).toHaveBeenCalledWith("new@test.com", "password123");
+  });
+
+  it("shows spinner when authLoading is true", () => {
+    render(
+      <AccountPanel
+        user={null}
+        authLoading={true}
+        authError={null}
+        entries={[]}
+        saving={false}
+        userEmissions={null}
+        onSignIn={mockOnSignIn}
+        onSignUp={mockOnSignUp}
+        onSignOut={mockOnSignOut}
+        onClaimHistory={mockOnClaimHistory}
+      />,
+    );
+
+    expect(screen.getByText("Processing...")).toBeInTheDocument();
+  });
+
+  it("shows authError when provided", () => {
+    render(
+      <AccountPanel
+        user={null}
+        authLoading={false}
+        authError="Invalid credentials"
+        entries={[]}
+        saving={false}
+        userEmissions={null}
+        onSignIn={mockOnSignIn}
+        onSignUp={mockOnSignUp}
+        onSignOut={mockOnSignOut}
+        onClaimHistory={mockOnClaimHistory}
+      />,
+    );
+
+    expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
+  });
+
+  it("handles form submission exceptions gracefully", () => {
+    mockOnSignIn.mockRejectedValueOnce(new Error("auth fail"));
+    render(
+      <AccountPanel
+        user={null}
+        authLoading={false}
+        authError={null}
+        entries={[]}
+        saving={false}
+        userEmissions={null}
+        onSignIn={mockOnSignIn}
+        onSignUp={mockOnSignUp}
+        onSignOut={mockOnSignOut}
+        onClaimHistory={mockOnClaimHistory}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText("Email Address"), { target: { value: "test@test.com" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "password123" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sign In" }));
+
+    waitFor(() => {
+      expect(screen.getByText("auth fail")).toBeInTheDocument();
+    });
   });
 
   it("passes accessibility checks", async () => {

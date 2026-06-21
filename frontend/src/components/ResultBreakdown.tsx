@@ -33,13 +33,11 @@ export function ResultBreakdown({ result, input }: Props) {
     entries[0],
   )[0];
 
-  const [prevHighestCategory, setPrevHighestCategory] = useState(highestCategory);
   const [selectedCategory, setSelectedCategory] = useState<string>(highestCategory);
 
-  if (highestCategory !== prevHighestCategory) {
+  useEffect(() => {
     setSelectedCategory(highestCategory);
-    setPrevHighestCategory(highestCategory);
-  }
+  }, [highestCategory]);
 
   useEffect(() => {
     // Trigger animations slightly after mounting

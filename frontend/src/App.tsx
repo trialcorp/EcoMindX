@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { CalculatorForm } from "./components/CalculatorForm";
 import { AnalyticsTab } from "./components/AnalyticsTab";
 import { InsightsPanel } from "./components/InsightsPanel";
@@ -80,47 +80,49 @@ export default function App() {
   }, [user, communityLoaded, loadCommunityData]);
 
   // Dynamically calculate user ranking on the leaderboard based on emissions
-  const userEmissions = result
-    ? result.total_annual_tonnes
-    : entries.length > 0
-      ? entries[0].result.total_annual_tonnes
-      : null;
+  const userEmissions = useMemo(() => {
+    return result
+      ? result.total_annual_tonnes
+      : entries.length > 0
+        ? entries[0].result.total_annual_tonnes
+        : null;
+  }, [result, entries]);
 
-  const leaderboardUsers = leaderboard.map((item) => ({
-    display_name: item.display_name,
-    score: item.score,
-    isUser: user ? item.user_id === user.id : false,
-    user_id: item.user_id,
-    name: item.display_name,
-  }));
+  const leaderboardUsers = useMemo(() => {
+    const list = leaderboard.map((item) => ({
+      display_name: item.display_name,
+      score: item.score,
+      isUser: user ? item.user_id === user.id : false,
+      user_id: item.user_id,
+      name: item.display_name,
+    }));
 
-  if (userEmissions !== null) {
-    const alreadyExists = leaderboardUsers.some(
-      (item) => item.isUser || (user && item.user_id === user.id),
-    );
-    if (!alreadyExists) {
-      leaderboardUsers.push({
-        display_name: user?.email ? `${user.email.split("@")[0]} (You)` : "You",
-        score: Number(userEmissions.toFixed(2)),
-        isUser: true,
-        user_id: user?.id || "anonymous",
-        name: user?.email ? `${user.email.split("@")[0]} (You)` : "You",
-      });
+    if (userEmissions !== null) {
+      const alreadyExists = list.some(
+        (item) => item.isUser || (user && item.user_id === user.id),
+      );
+      if (!alreadyExists) {
+        list.push({
+          display_name: user?.email ? `${user.email.split("@")[0]} (You)` : "You",
+          score: Number(userEmissions.toFixed(2)),
+          isUser: true,
+          user_id: user?.id || "anonymous",
+          name: user?.email ? `${user.email.split("@")[0]} (You)` : "You",
+        });
+      }
     }
-  }
 
-  leaderboardUsers.sort((a, b) => a.score - b.score);
+    return [...list].sort((a, b) => a.score - b.score);
+  }, [leaderboard, user, userEmissions]);
 
   // Compute highest emission category from result
-  const getHighestEmissionCategory = useCallback(() => {
+  const highestCategory = useMemo(() => {
     if (!result || !result.breakdown_kg) return null;
     const { transport, home, diet, consumption } = result.breakdown_kg;
     const entriesList = Object.entries({ transport, home, diet, consumption });
     entriesList.sort((a, b) => b[1] - a[1]);
     return entriesList[0][0];
   }, [result]);
-
-  const highestCategory = getHighestEmissionCategory();
 
   // Helper: wrap the tip sharing callback to match the expected signature
   const handleShareTip = async (

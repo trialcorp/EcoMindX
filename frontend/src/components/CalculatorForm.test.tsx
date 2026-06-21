@@ -92,4 +92,37 @@ describe("CalculatorForm", () => {
     expect(screen.getByLabelText(/short-haul flights/i)).toHaveAttribute("max", "200");
     expect(screen.getByLabelText(/people in household/i)).toHaveAttribute("max", "50");
   });
+
+  it("navigates between steps using buttons and tabs", async () => {
+    render(<CalculatorForm onSubmit={() => {}} loading={false} />);
+    
+    // We start at Step 1
+    expect(screen.getByRole("tab", { name: /Mobility/i })).toHaveAttribute("aria-selected", "true");
+    
+    // Click Continue to go to Step 2
+    const continueBtn1 = screen.getByRole("button", { name: /Continue/i });
+    await userEvent.click(continueBtn1);
+    expect(screen.getByRole("tab", { name: /Home Utilities/i })).toHaveAttribute("aria-selected", "true");
+
+    // Click Continue to go to Step 3
+    const continueBtn2 = screen.getByRole("button", { name: /Continue/i });
+    await userEvent.click(continueBtn2);
+    expect(screen.getByRole("tab", { name: /Lifestyle & Diet/i })).toHaveAttribute("aria-selected", "true");
+
+    // Click Back to go to Step 2
+    const backBtn = screen.getByRole("button", { name: /Back/i });
+    await userEvent.click(backBtn);
+    expect(screen.getByRole("tab", { name: /Home Utilities/i })).toHaveAttribute("aria-selected", "true");
+
+    // Direct tab click to go to Step 1
+    const mobilityTab = screen.getByRole("tab", { name: /Mobility/i });
+    await userEvent.click(mobilityTab);
+    expect(screen.getByRole("tab", { name: /Mobility/i })).toHaveAttribute("aria-selected", "true");
+
+    // Direct tab click to go to Step 3
+    const lifestyleTab = screen.getByRole("tab", { name: /Lifestyle & Diet/i });
+    await userEvent.click(lifestyleTab);
+    expect(screen.getByRole("tab", { name: /Lifestyle & Diet/i })).toHaveAttribute("aria-selected", "true");
+  });
 });
+
