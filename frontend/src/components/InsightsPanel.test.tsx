@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, act } from "@testing-library/react";
 import { axe } from "vitest-axe";
 import { InsightsPanel } from "./InsightsPanel";
 import type { InsightsResponse } from "../lib/types";
@@ -14,23 +14,53 @@ const baseInsights: InsightsResponse = {
 };
 
 describe("InsightsPanel", () => {
-  it("has no accessibility violations", async () => {
-    const { container } = render(<InsightsPanel insights={baseInsights} />);
-    expect(await axe(container)).toHaveNoViolations();
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  /** Render and fast-forward past the generation loading animation. */
+  function renderAndFlush(insights: InsightsResponse) {
+    const view = render(<InsightsPanel insights={insights} />);
+    act(() => {
+      vi.advanceTimersByTime(1600);
+    });
+    return view;
+  }
+
+  it(
+    "has no accessibility violations",
+    async () => {
+      // axe-core relies on real timers internally, so run this test outside fake timers.
+      vi.useRealTimers();
+      const { container } = render(<InsightsPanel insights={baseInsights} />);
+      // Wait for the generation delay to resolve naturally.
+      await new Promise((r) => setTimeout(r, 1600));
+      expect(await axe(container)).toHaveNoViolations();
+    },
+    10000,
+  );
+
+  it("shows a generating state initially", () => {
+    render(<InsightsPanel insights={baseInsights} />);
+    expect(screen.getByText(/AI is analyzing your footprint/i)).toBeInTheDocument();
   });
 
   it("labels AI-generated insights as such", () => {
-    render(<InsightsPanel insights={baseInsights} />);
+    renderAndFlush(baseInsights);
     expect(screen.getByText("AI-personalized")).toBeInTheDocument();
   });
 
   it("labels rule-based insights as smart rules", () => {
-    render(<InsightsPanel insights={{ ...baseInsights, source: "rules" }} />);
+    renderAndFlush({ ...baseInsights, source: "rules" });
     expect(screen.getByText("Smart rules")).toBeInTheDocument();
   });
 
   it("renders the summary and every recommendation with its saving", () => {
-    render(<InsightsPanel insights={baseInsights} />);
+    renderAndFlush(baseInsights);
     expect(screen.getByText(baseInsights.summary)).toBeInTheDocument();
     expect(screen.getAllByRole("listitem")).toHaveLength(2);
     expect(screen.getByText(/take the train/i)).toBeInTheDocument();

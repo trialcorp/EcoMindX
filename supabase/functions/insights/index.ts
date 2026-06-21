@@ -217,13 +217,38 @@ Deno.serve(async (req: Request) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  // Parse body once upfront — a consumed ReadableStream cannot be re-read.
+  let parsedData: CarbonInput | null = null;
+  let parsedResult: FootprintResult | null = null;
+
   try {
+    // Enforce request size limit (100 KB max)
+    const contentLength = parseInt(req.headers.get("content-length") || "0", 10);
+    if (contentLength > 102400) {
+      return new Response(JSON.stringify({ error: "Request body too large" }), {
+        status: 413,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const body = await req.json();
     const { data, result } = body as { data: CarbonInput; result: FootprintResult };
 
     if (!data || !result) {
       throw new Error("Missing 'data' or 'result' in request body");
     }
+
+    // Validate required nested fields
+    if (!data.transport || !data.home || !data.diet || !data.consumption) {
+      throw new Error("Incomplete input data: transport, home, diet, and consumption are required");
+    }
+    if (!result.breakdown_kg || typeof result.total_annual_kg !== "number") {
+      throw new Error("Incomplete result data: breakdown_kg and total_annual_kg are required");
+    }
+
+    // Store for fallback use in catch block
+    parsedData = data;
+    parsedResult = result;
 
     const apiKey = Deno.env.get("GEMINI_API_KEY");
     if (!apiKey) {
@@ -324,17 +349,17 @@ Give tailored advice to reduce the largest sources.`;
     });
   } catch (error: any) {
     console.error("Error in insights generation, falling back to rule-based engine:", error);
-    try {
-      const body = await req.json();
-      const { data, result } = body as { data: CarbonInput; result: FootprintResult };
-      return new Response(JSON.stringify(generateRuleBasedInsights(data, result)), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    } catch (fallbackError) {
-      return new Response(JSON.stringify({ error: "Failed to generate insights: " + error.message }), {
-        status: 500,
+
+    // Use the pre-parsed data instead of re-reading the consumed request body.
+    if (parsedData && parsedResult) {
+      return new Response(JSON.stringify(generateRuleBasedInsights(parsedData, parsedResult)), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    return new Response(JSON.stringify({ error: "Failed to generate insights: " + error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

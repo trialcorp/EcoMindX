@@ -1,54 +1,67 @@
 # Architecture — EcoMindX
 
-EcoMindX is structured as a modern Serverless Single Page Application (SPA), deploying a React + TypeScript frontend that communicates directly with Supabase for data persistence, authentication, and AI insights.
+## Overview
+EcoMindX is a **Local-First Serverless Single Page Application (SPA)**. It prioritizes user privacy and immediate responsiveness by storing data locally until the user explicitly decides to synchronize with the cloud.
 
-## System Overview
+## Core Components
 
-```text
-Browser (React + TS, Vite)                  Supabase (Cloud)
-  • Progressive Wizard Form                 ├─ Authentication (Supabase Auth)
-  • Sustain Analytics (SVG Gauges)          ├─ Database (public.entries table)
-  • Gamified Quests & Social Hub            └─ Edge Functions (Deno Runtime)
-  • Supabase JS Client  ───────────────────────► insights (calls Google Gemini)
+### 1. Frontend (React + Vite)
+- **State Management**: Handled primarily via custom hook orchestration (`useFootprint.ts`) bridging React state and `localStorage`.
+- **Component Design**: Modular architecture separating UI shells (`CommunityHub`, `EcoChallenges`, `AccountPanel`) from core logic.
+- **Styling**: Vanilla CSS utilizing CSS variables for theme tokens (dark mode, glassmorphism) and responsive grid/flexbox layouts. CSS `content-visibility` used for off-screen rendering optimization.
+
+### 2. Backend (Supabase)
+- **Database (PostgreSQL)**: Handles persistent storage of user profiles, historical footprint entries, and community tips.
+- **Authentication**: Supabase Auth (Email/Password) integrated with Row Level Security (RLS).
+- **Edge Functions (Deno)**: Serverless functions deployed globally to execute sensitive logic (e.g., calling the Gemini API).
+
+### 3. Intelligence Layer (Google Gemini)
+- Deployed via Supabase Edge Functions to ensure API keys are never exposed to the client browser.
+- Uses `gemini-2.5-flash` model for fast, structured JSON generation of personalized action plans.
+- Includes a graceful **Deterministic Rule-Based Fallback** if the AI service is unavailable or rate-limited.
+
+---
+
+## Data Flow Diagram
+
+```mermaid
+graph TD
+    %% User Inputs
+    User((User)) -->|Enters Data| Calc[Carbon Calculator Wizard]
+    
+    %% Local Processing
+    Calc -->|Raw Input| Engine[Carbon Math Engine]
+    Engine -->|CO2e Breakdown| State[(Local Storage)]
+    
+    %% AI Generation Flow
+    State -->|Triggers| Edge[Supabase Edge Function]
+    Edge -->|Prompt + Context| Gemini[Google Gemini API]
+    Gemini -->|Actionable JSON| Edge
+    Edge -->|Validation| UI[Insights Panel UI]
+    
+    %% Sync Flow
+    User -->|Sign In / Sync| Auth[Supabase Auth]
+    Auth -->|Token| SyncFlow[Data Sync Layer]
+    State -->|Push Unclaimed| SyncFlow
+    SyncFlow -->|Insert| DB[(PostgreSQL DB)]
+    
+    %% Gamification
+    UI -->|Accepts Suggestion| Quests[Eco-Challenges Engine]
+    Quests -->|Awards Points| User
 ```
 
-## Backend Services (Supabase)
-
-### 1. Database Layer (`public.entries`)
-Stores lifestyle carbon assessments.
-* **Columns**:
-  * `id`: uuid primary key.
-  * `created_at`: timestamp of creation.
-  * `device_id`: anonymous tracker for non-logged-in history.
-  * `input`: jsonb of questionnaire metrics.
-  * `result`: jsonb of carbon breakdown figures.
-  * `user_id`: uuid referencing `auth.users(id)` (optional, set when logged in).
-* **Row Level Security (RLS)**:
-  * Inserts allowed if anonymous (`user_id` is null) or if authenticated and matches `auth.uid()`.
-  * Selects allowed for anyone if `user_id` is null, or restricted to `auth.uid()` if authenticated.
-
-### 2. Authentication
-Supabase Auth manages user profiles, passwords, and sessions. A "Claim History" feature links anonymous local history entries (matched by `device_id`) to the newly signed-in user's `user_id`.
-
-### 3. AI Insights (Edge Function)
-A Deno Dedge Function (`supabase/functions/insights`) is called by the client:
-* Accepts the current input and calculated breakdown.
-* Calls **Google Gemini** models to generate personalized summary text and action items.
-* Falls back to a local rule-based insights system in case of Gemini timeout or quota exhaustion.
-
 ---
 
-## Frontend Layout
+## Security & Accessibility Layers
 
-| Concern | Location |
-| --- | --- |
-| **State & Auth Orchestration** | `src/hooks/useFootprint.ts` handles active user state, calculating, saving, and claiming local entries. |
-| **Styling & Theme** | `src/styles/theme.css` implements a custom dark glassmorphic design system using pure CSS. |
-| **Presentation Elements** | `src/components/` (Calculator step wizard, Result circle dials, Commitment checklist, Leaderboards, Quests, Auth forms). |
-| **Types & Formats** | `src/lib/` (Supabase Client, format functions, type interfaces matching DB schema). |
+### Security Architecture
+- **Anonymous Tracking**: A `device_id` uuid is generated locally. Users can calculate and track footprints entirely anonymously.
+- **RLS Policies**: The `entries` table allows inserts for anonymous users (`user_id is null`) or authenticated users (`user_id = auth.uid()`). Users can only read their own data. Claiming anonymous history transitions ownership safely.
+- **Validation & Sanitization**: Strict bounds clamping on the frontend combined with data validation at the edge function layer.
+- **Headers**: Vercel `vercel.json` applies strict CSP, X-Frame-Options, and Referrer policies.
 
----
-
-## Quality Gates
-
-Every push runs linting (ESLint + jsx-a11y), Prettier formatting checks, strict TypeScript type checking (`tsc --noEmit`), and Vitest test suites with enforced statement/branch thresholds.
+### Accessibility (a11y) Architecture
+- **Semantic HTML**: Proper use of `<section>`, `role="region"`, and `<fieldset>`.
+- **Live Regions**: Screen reader announcements via `aria-live="polite"` for dynamic content like API responses and gamification confetti.
+- **Motion Control**: `prefers-reduced-motion` media queries suppress all decorative animations automatically for users with motion sensitivities.
+- **Touch Targets**: CSS enforces minimum 44x44px hit areas on mobile devices.

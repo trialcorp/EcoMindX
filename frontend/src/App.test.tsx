@@ -1,5 +1,5 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "vitest-axe";
 import App from "./App";
@@ -40,6 +40,7 @@ const insights: InsightsResponse = {
 };
 
 beforeEach(() => {
+  vi.useFakeTimers({ shouldAdvanceTime: true });
   vi.clearAllMocks();
   vi.mocked(api.listEntries).mockResolvedValue([]);
   vi.mocked(api.calculate).mockResolvedValue(result);
@@ -51,6 +52,10 @@ beforeEach(() => {
     input: {} as never,
     result,
   });
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 /** Render the app and wait for the initial history load to settle. */
@@ -66,14 +71,33 @@ describe("App", () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
-  it("calculates and shows results plus personalized insights", async () => {
+  it("calculates and shows results on the analytics tab", async () => {
+    await renderApp();
+    await userEvent.click(screen.getByRole("button", { name: /calculate my footprint/i }));
+
+    // After calculation, the app auto-navigates to the analytics tab.
+    await waitFor(() => expect(screen.getByText(/your estimated footprint/i)).toBeInTheDocument());
+    expect(api.calculate).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows personalized insights on the AI Action Plan tab", async () => {
     await renderApp();
     await userEvent.click(screen.getByRole("button", { name: /calculate my footprint/i }));
 
     await waitFor(() => expect(screen.getByText(/your estimated footprint/i)).toBeInTheDocument());
-    expect(screen.getByRole("heading", { name: /personalized insights/i })).toBeInTheDocument();
+
+    // Navigate to the AI Action Plan (insights) tab.
+    await userEvent.click(screen.getByRole("button", { name: /ai action plan/i }));
+
+    // Fast-forward past the 1.5s insights generation animation.
+    act(() => {
+      vi.advanceTimersByTime(1600);
+    });
+
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { name: /personalized insights/i })).toBeInTheDocument(),
+    );
     expect(screen.getByText(/drive less/i)).toBeInTheDocument();
-    expect(api.calculate).toHaveBeenCalledTimes(1);
   });
 
   it("announces readiness to screen readers via the status live region", async () => {

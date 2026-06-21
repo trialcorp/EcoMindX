@@ -74,9 +74,23 @@ export function NumberField({
           step={step}
           inputMode={step === "any" ? "decimal" : "numeric"}
           aria-describedby={hintId}
-          value={inputValue}
-          onChange={(e) => handleInputChange(e.target.value)}
-          onBlur={handleBlur}
+          value={value === 0 && !id.includes("household") ? "" : value}
+          onChange={(e) => {
+            if (e.target.value === "") {
+              onChange(0);
+              return;
+            }
+            const parsed = parseFloat(e.target.value);
+            if (!Number.isNaN(parsed)) onChange(parsed);
+          }}
+          onBlur={(e) => {
+            let parsed = parseFloat(e.target.value);
+            if (Number.isNaN(parsed)) parsed = 0;
+            parsed = Math.max(min, Math.min(parsed, max));
+            onChange(parsed);
+            handleBlur();
+          }}
+          style={{ width: "120px" }}
         />
         <input
           type="range"

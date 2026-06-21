@@ -39,3 +39,4 @@ build/
 supabase/.temp/
 
 .vercel
+.gemini/

@@ -42,9 +42,29 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
   const patchConsumption = (patch: Partial<CarbonInput["consumption"]>) =>
     setInput((p) => ({ ...p, consumption: { ...p.consumption, ...patch } }));
 
+  const sanitizeInput = (raw: CarbonInput): CarbonInput => ({
+    transport: {
+      car_km_per_week: Math.max(0, Math.min(raw.transport.car_km_per_week || 0, MAX_KM_WEEK)),
+      car_fuel: raw.transport.car_fuel,
+      public_transit_km_per_week: Math.max(0, Math.min(raw.transport.public_transit_km_per_week || 0, MAX_KM_WEEK)),
+      short_haul_flights_per_year: Math.max(0, Math.min(raw.transport.short_haul_flights_per_year || 0, MAX_FLIGHTS)),
+      long_haul_flights_per_year: Math.max(0, Math.min(raw.transport.long_haul_flights_per_year || 0, MAX_FLIGHTS)),
+    },
+    home: {
+      electricity_kwh_per_month: Math.max(0, Math.min(raw.home.electricity_kwh_per_month || 0, MAX_KWH_MONTH)),
+      natural_gas_kwh_per_month: Math.max(0, Math.min(raw.home.natural_gas_kwh_per_month || 0, MAX_KWH_MONTH)),
+      household_size: Math.max(1, Math.min(raw.home.household_size || 1, MAX_HOUSEHOLD)),
+    },
+    diet: raw.diet,
+    consumption: {
+      goods_spend_usd_per_month: Math.max(0, Math.min(raw.consumption.goods_spend_usd_per_month || 0, MAX_USD_MONTH)),
+      waste_kg_per_week: Math.max(0, Math.min(raw.consumption.waste_kg_per_week || 0, MAX_WASTE_WEEK)),
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(input);
+    onSubmit(sanitizeInput(input));
   };
 
   return (
@@ -75,9 +95,10 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
           onClick={() => setStep(1)}
           role="tab"
           aria-selected={step === 1}
+          aria-current={step === 1 ? "step" : undefined}
           aria-controls="step-transport"
         >
-          1. Mobility
+          1. Mobility {step === 1 ? "(Current)" : ""}
         </button>
         <button
           type="button"
@@ -85,9 +106,10 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
           onClick={() => setStep(2)}
           role="tab"
           aria-selected={step === 2}
+          aria-current={step === 2 ? "step" : undefined}
           aria-controls="step-home"
         >
-          2. Home Utilities
+          2. Home Utilities {step === 2 ? "(Current)" : ""}
         </button>
         <button
           type="button"
@@ -95,9 +117,10 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
           onClick={() => setStep(3)}
           role="tab"
           aria-selected={step === 3}
+          aria-current={step === 3 ? "step" : undefined}
           aria-controls="step-lifestyle"
         >
-          3. Lifestyle & Diet
+          3. Lifestyle & Diet {step === 3 ? "(Current)" : ""}
         </button>
       </div>
 

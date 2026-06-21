@@ -1892,3 +1892,64 @@ table.history td {
   font-size: 0.75rem;
   color: var(--muted);
 }
+
+/* ─── Accessibility: Reduced Motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .bg-glow-blob {
+    animation: none !important;
+  }
+  .confetti-canvas {
+    display: none !important;
+  }
+}
+
+/* ─── Accessibility: High Contrast ─── */
+@media (prefers-contrast: more) {
+  :root {
+    --surface-border: rgba(255, 255, 255, 0.3);
+    --border: rgba(255, 255, 255, 0.3);
+    --muted: #d1d5db;
+  }
+  .card {
+    border-width: 2px;
+  }
+  .btn {
+    border: 2px solid #fff;
+  }
+  .recommendation {
+    border-left-width: 6px;
+  }
+}
+
+/* ─── Accessibility: Minimum Touch Targets ─── */
+@media (pointer: coarse) {
+  .nav-tab-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  .step-tab {
+    min-height: 44px;
+  }
+  .commit-checkbox {
+    width: 44px;
+    height: 44px;
+  }
+  .quest-filter-btn {
+    min-height: 44px;
+  }
+  .tip-delete-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .btn {
+    min-height: 44px;
+  }
+}
