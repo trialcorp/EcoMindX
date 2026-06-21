@@ -221,25 +221,16 @@ export default function App() {
               className="header-avatar"
               onClick={() => setActiveTab("account")}
               title="Go to Profile"
-              style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+              aria-label="Go to Profile"
             >
               {user.email?.[0].toUpperCase()}
             </button>
-            <button
-              className="btn secondary"
-              onClick={signOut}
-              style={{ padding: "0.4rem 0.8rem", fontSize: "0.75rem", fontWeight: 700 }}
-              disabled={authLoading}
-            >
+            <button className="btn secondary sm" onClick={signOut} disabled={authLoading}>
               Sign Out
             </button>
           </div>
         ) : (
-          <button
-            className="btn secondary"
-            onClick={() => setActiveTab("account")}
-            style={{ padding: "0.4rem 0.8rem", fontSize: "0.75rem", fontWeight: 700 }}
-          >
+          <button className="btn secondary sm" onClick={() => setActiveTab("account")}>
             Sign In / Register
           </button>
         )}
@@ -247,12 +238,16 @@ export default function App() {
 
       <div className="dashboard-container">
         <aside className="sidebar">
-          <nav className="sidebar-nav" aria-label="Dashboard navigation">
+          <div className="sidebar-nav" role="tablist" aria-label="Dashboard navigation">
             {NAV_TABS.map((tab) => (
               <button
                 key={tab.id}
+                id={`tab-${tab.id}`}
                 className={`nav-tab-btn ${activeTab === tab.id ? "active" : ""}`}
                 onClick={() => setActiveTab(tab.id)}
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                aria-controls={`panel-${tab.id}`}
               >
                 <svg
                   fill="none"
@@ -270,7 +265,7 @@ export default function App() {
                 {tab.label}
               </button>
             ))}
-          </nav>
+          </div>
         </aside>
 
         <main id="main">
@@ -282,46 +277,51 @@ export default function App() {
           </p>
 
           {/* Conditionally render tabs — only the active tab is mounted */}
-          {activeTab === "calculator" && <CalculatorForm onSubmit={calculate} loading={loading} />}
+          <div role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+            {activeTab === "calculator" && (
+              <CalculatorForm onSubmit={calculate} loading={loading} />
+            )}
 
-          {activeTab === "analytics" && (
-            <AnalyticsTab result={result} lastInput={lastInput} saving={saving} onSave={save} />
-          )}
+            {activeTab === "analytics" && (
+              <AnalyticsTab result={result} lastInput={lastInput} saving={saving} onSave={save} />
+            )}
 
-          {activeTab === "insights" &&
-            (result && insights ? <InsightsPanel insights={insights} /> : <InsightsEmptyState />)}
+            {activeTab === "insights" &&
+              (result && insights ? <InsightsPanel insights={insights} /> : <InsightsEmptyState />)}
 
-          {activeTab === "community" && (
-            <CommunityHub
-              leaderboardUsers={leaderboardUsers}
-              collectiveSaved={collectiveSaved}
-              communityTips={communityTips}
-              loadingCommunity={loadingCommunity}
-              communityError={communityError}
-              user={user}
-              onShareTip={handleShareTip}
-              onDeleteTip={handleDeleteTip}
-            />
-          )}
+            {activeTab === "community" && (
+              <CommunityHub
+                leaderboardUsers={leaderboardUsers}
+                collectiveSaved={collectiveSaved}
+                communityTips={communityTips}
+                loadingCommunity={loadingCommunity}
+                communityError={communityError}
+                user={user}
+                onShareTip={handleShareTip}
+                onDeleteTip={handleDeleteTip}
+                onSignInClick={() => setActiveTab("account")}
+              />
+            )}
 
-          {activeTab === "challenges" && <EcoChallenges highestCategory={highestCategory} />}
+            {activeTab === "challenges" && <EcoChallenges highestCategory={highestCategory} />}
 
-          {activeTab === "account" && (
-            <AccountPanel
-              user={user}
-              authLoading={authLoading}
-              authError={authError}
-              entries={entries}
-              saving={saving}
-              userEmissions={userEmissions}
-              onSignIn={signIn}
-              onSignUp={signUp}
-              onSignOut={signOut}
-              onClaimHistory={claimHistory}
-            />
-          )}
+            {activeTab === "account" && (
+              <AccountPanel
+                user={user}
+                authLoading={authLoading}
+                authError={authError}
+                entries={entries}
+                saving={saving}
+                userEmissions={userEmissions}
+                onSignIn={signIn}
+                onSignUp={signUp}
+                onSignOut={signOut}
+                onClaimHistory={claimHistory}
+              />
+            )}
 
-          {activeTab === "history" && <HistoryPanel entries={entries} />}
+            {activeTab === "history" && <HistoryPanel entries={entries} />}
+          </div>
         </main>
       </div>
     </>

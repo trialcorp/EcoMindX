@@ -19,10 +19,7 @@ export function InsightsEmptyState() {
   }, []);
 
   return (
-    <div
-      className="card insights-empty-wrapper"
-      style={{ position: "relative", overflow: "hidden" }}
-    >
+    <div className="card insights-empty-wrapper">
       {/* Blurred background mock elements */}
       <div className="blurred-mockup" aria-hidden="true">
         <div className="mock-title"></div>
@@ -36,10 +33,7 @@ export function InsightsEmptyState() {
       </div>
 
       {/* Foreground Content */}
-      <div
-        className="empty-state-content"
-        style={{ position: "relative", zIndex: 10, textAlign: "center", padding: "3rem 2rem" }}
-      >
+      <div className="empty-state-content">
         <div className="scanning-icon">
           <svg
             width="64"
@@ -48,7 +42,6 @@ export function InsightsEmptyState() {
             fill="none"
             stroke="currentColor"
             strokeWidth="1.5"
-            style={{ color: "var(--primary)" }}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
@@ -58,21 +51,8 @@ export function InsightsEmptyState() {
             />
           </svg>
         </div>
-        <h2
-          style={{
-            border: "none",
-            padding: 0,
-            margin: "1rem 0 0.5rem 0",
-            justifyContent: "center",
-            background: "none",
-            color: "#fff",
-          }}
-        >
-          Awaiting Your Data
-        </h2>
-        <p style={{ color: "var(--text)", margin: "0 0 2rem 0" }}>
-          Calculate your footprint to unlock your personalized, AI-generated action plan.
-        </p>
+        <h2>Awaiting Your Data</h2>
+        <p>Calculate your footprint to unlock your personalized, AI-generated action plan.</p>
 
         <div className="eco-fact-box" aria-live="polite">
           <span className="fact-label">Eco Fact</span>

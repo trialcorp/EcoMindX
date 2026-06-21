@@ -67,12 +67,7 @@ export function ConfirmDialog({
           <button ref={cancelRef} className="btn secondary" onClick={onCancel} type="button">
             {cancelLabel}
           </button>
-          <button
-            className="btn"
-            onClick={onConfirm}
-            type="button"
-            style={{ background: "linear-gradient(135deg, #ef4444, #dc2626)" }}
-          >
+          <button className="btn danger" onClick={onConfirm} type="button">
             {confirmLabel}
           </button>
         </div>

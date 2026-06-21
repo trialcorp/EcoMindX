@@ -33,15 +33,24 @@ export function ResultBreakdown({ result, input }: Props) {
     entries[0],
   )[0];
 
+  const [prevHighestCategory, setPrevHighestCategory] = useState(highestCategory);
   const [selectedCategory, setSelectedCategory] = useState<string>(highestCategory);
 
-  useEffect(() => {
-    // Sync default category if result changes
+  if (highestCategory !== prevHighestCategory) {
     setSelectedCategory(highestCategory);
-  }, [result, highestCategory]);
+    setPrevHighestCategory(highestCategory);
+  }
 
   useEffect(() => {
     // Trigger animations slightly after mounting
+    if (
+      typeof globalThis !== "undefined" &&
+      (globalThis as typeof globalThis & { process?: { env?: { NODE_ENV?: string } } }).process?.env
+        ?.NODE_ENV === "test"
+    ) {
+      setAnimate(true);
+      return;
+    }
     const timer = setTimeout(() => setAnimate(true), 50);
     return () => clearTimeout(timer);
   }, [result]);
@@ -61,7 +70,7 @@ export function ResultBreakdown({ result, input }: Props) {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          style={{ color: "var(--primary)" }}
+          className="result-card-title-icon"
           xmlns="http://www.w3.org/2000/svg"
         >
           <circle cx="12" cy="12" r="10" />
@@ -119,16 +128,7 @@ export function ResultBreakdown({ result, input }: Props) {
       </div>
 
       {/* Visual Circle Gauge & Summary */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "2rem",
-          alignItems: "center",
-          marginBottom: "2rem",
-        }}
-        className="gauge-responsive-split"
-      >
+      <div className="gauge-responsive-split result-gauge-responsive-split">
         <div className="gauge-wrapper">
           <svg className="gauge-svg" width="140" height="140" viewBox="0 0 120 120">
             <circle className="gauge-bg" cx="60" cy="60" r={radius} />
@@ -142,28 +142,17 @@ export function ResultBreakdown({ result, input }: Props) {
             />
           </svg>
           <div className="gauge-text">
-            <span style={{ fontSize: "1.5rem", fontWeight: 700, color: "#fff" }}>
-              {sustainabilityScore}%
-            </span>
-            <span
-              style={{
-                fontSize: "0.7rem",
-                color: "var(--muted)",
-                textTransform: "uppercase",
-                fontWeight: 600,
-              }}
-            >
-              Sustain Index
-            </span>
+            <span className="result-gauge-text-pct">{sustainabilityScore}%</span>
+            <span className="result-gauge-text-label">Sustain Index</span>
           </div>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-          <p style={{ margin: 0, fontSize: "1.05rem", fontWeight: 500 }}>
+        <div className="result-gauge-description-wrapper">
+          <p className="result-gauge-description">
             Your sustainability index is{" "}
             <strong className={overTarget ? "over" : "under"}>{sustainabilityScore}%</strong>.
           </p>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.9rem" }}>
+          <p className="result-gauge-description-sub">
             This footprint represents{" "}
             <strong>{result.comparison.ratio_to_sustainable_target.toFixed(1)}×</strong> the
             sustainable climate target and{" "}
@@ -173,29 +162,19 @@ export function ResultBreakdown({ result, input }: Props) {
         </div>
       </div>
 
-      <h3
-        style={{
-          fontFamily: "var(--font-display)",
-          borderBottom: "1px solid var(--border)",
-          paddingBottom: "0.5rem",
-          marginBottom: "1rem",
-        }}
-      >
-        Breakdown by category
-      </h3>
+      <h3 className="result-category-header">Breakdown by category</h3>
       <div
         aria-label="Bar chart of emissions by category, values listed in the table below"
-        style={{ marginBottom: "2rem" }}
+        className="result-bar-chart-container"
       >
         {entries.map(([key, value]) => {
           const fillWidth = animate ? `${(value / max) * 100}%` : "0%";
           const isActive = selectedCategory === key;
           return (
             <div
-              className={`bar-row ${isActive ? "active" : ""}`}
+              className={`bar-row result-bar-row-interactive ${isActive ? "active" : ""}`}
               key={key}
               onClick={() => setSelectedCategory(key)}
-              style={{ cursor: "pointer" }}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
@@ -217,25 +196,8 @@ export function ResultBreakdown({ result, input }: Props) {
 
       {/* Interactive Detail Card */}
       {input && (
-        <div
-          className="card category-detail-card"
-          style={{
-            marginTop: "1.5rem",
-            background: "rgba(255, 255, 255, 0.02)",
-            border: "1px dashed rgba(16, 185, 129, 0.25)",
-          }}
-        >
-          <h4
-            style={{
-              margin: "0 0 1rem 0",
-              color: "var(--primary-hover)",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              fontSize: "1.05rem",
-              fontFamily: "var(--font-display)",
-            }}
-          >
+        <div className="card category-detail-card result-category-detail-card">
+          <h4 className="result-category-detail-card-title">
             <svg
               width="18"
               height="18"
@@ -253,14 +215,7 @@ export function ResultBreakdown({ result, input }: Props) {
             Selected Category Analysis: {categoryLabel(selectedCategory)}
           </h4>
 
-          <div
-            className="detail-grid"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-              gap: "1rem",
-            }}
-          >
+          <div className="detail-grid result-detail-grid">
             {selectedCategory === "transport" && (
               <>
                 <div className="detail-item">
@@ -268,7 +223,7 @@ export function ResultBreakdown({ result, input }: Props) {
                   <span className="detail-value">{input.transport.car_km_per_week} km/week</span>
                   <span className="detail-desc">
                     Fuel type:{" "}
-                    <strong style={{ textTransform: "capitalize" }}>
+                    <strong className="result-detail-item-value-capitalized">
                       {input.transport.car_fuel}
                     </strong>
                   </span>
@@ -323,7 +278,7 @@ export function ResultBreakdown({ result, input }: Props) {
               <>
                 <div className="detail-item">
                   <span className="detail-label">Dietary Preference</span>
-                  <span className="detail-value" style={{ textTransform: "capitalize" }}>
+                  <span className="detail-value result-detail-item-value-capitalized">
                     {input.diet.replace("_", " ")}
                   </span>
                   <span className="detail-desc">
@@ -379,10 +334,10 @@ export function ResultBreakdown({ result, input }: Props) {
         <tbody>
           {entries.map(([key, value]) => (
             <tr key={key}>
-              <th scope="row" style={{ color: "var(--muted)" }}>
+              <th scope="row" className="result-table-header-muted">
                 {categoryLabel(key)}
               </th>
-              <td style={{ fontWeight: 600 }}>{formatKg(value)}</td>
+              <td className="result-table-data-bold">{formatKg(value)}</td>
             </tr>
           ))}
         </tbody>

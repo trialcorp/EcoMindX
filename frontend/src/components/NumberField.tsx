@@ -34,19 +34,22 @@ export function NumberField({
   const sliderStep = step === "any" ? 1 : step;
 
   // Track the raw text typed by the user to allow empty input and decimals
-  const [inputValue, setInputValue] = useState<string>(value.toString());
+  const [inputValue, setInputValue] = useState<string>(
+    value === 0 && !id.includes("household") ? "" : value.toString(),
+  );
 
   // Keep local input in sync with external changes (e.g. from range slider or parent resets)
   useEffect(() => {
     if (Number(inputValue) !== value) {
-      setInputValue(value.toString());
+      setInputValue(value === 0 && !id.includes("household") ? "" : value.toString());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   const handleBlur = () => {
-    // Revert/format local state to the official number value on blur (e.g. converts empty back to "0")
-    setInputValue(value.toString());
+    const parsed = parseFloat(inputValue);
+    const finalVal = Number.isNaN(parsed) ? 0 : Math.max(min, Math.min(parsed, max));
+    setInputValue(finalVal === 0 && !id.includes("household") ? "" : finalVal.toString());
   };
 
   return (
@@ -61,13 +64,15 @@ export function NumberField({
           step={step}
           inputMode={step === "any" ? "decimal" : "numeric"}
           aria-describedby={hintId}
-          value={value === 0 && !id.includes("household") ? "" : value}
+          value={inputValue}
           onChange={(e) => {
-            if (e.target.value === "") {
+            const raw = e.target.value;
+            setInputValue(raw);
+            if (raw === "") {
               onChange(0);
               return;
             }
-            const parsed = parseFloat(e.target.value);
+            const parsed = parseFloat(raw);
             if (!Number.isNaN(parsed)) onChange(parsed);
           }}
           onBlur={(e) => {
@@ -77,7 +82,6 @@ export function NumberField({
             onChange(parsed);
             handleBlur();
           }}
-          style={{ width: "120px" }}
         />
         <input
           type="range"

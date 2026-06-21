@@ -18,7 +18,7 @@ describe("CalculatorForm", () => {
     await userEvent.clear(carKm);
     await userEvent.type(carKm, "120");
 
-    await userEvent.selectOptions(screen.getByLabelText(/diet/i), "vegan");
+    await userEvent.selectOptions(screen.getByLabelText("Diet"), "vegan");
     await userEvent.click(screen.getByRole("button", { name: /calculate my footprint/i }));
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
@@ -45,7 +45,7 @@ describe("CalculatorForm", () => {
     await fill(/electricity per month/i, "250");
     await fill(/natural gas per month/i, "120");
     await fill(/people in household/i, "3");
-    await userEvent.selectOptions(screen.getByLabelText(/diet/i), "vegetarian");
+    await userEvent.selectOptions(screen.getByLabelText("Diet"), "vegetarian");
     await fill(/goods spending per month/i, "300");
     await fill(/landfill waste per week/i, "5");
     await userEvent.click(screen.getByRole("button", { name: /calculate my footprint/i }));

@@ -20,14 +20,14 @@ export function HistoryPanel({ entries }: Props) {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{ color: "var(--primary)" }}
+            className="history-card-title-icon"
             xmlns="http://www.w3.org/2000/svg"
           >
             <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           Your history
         </h2>
-        <p style={{ color: "var(--muted)", margin: 0, padding: "1.5rem 0", textAlign: "center" }}>
+        <p className="history-empty-note">
           No saved entries yet. Calculate and save a footprint to start tracking your progress.
         </p>
       </section>
@@ -79,7 +79,7 @@ export function HistoryPanel({ entries }: Props) {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          style={{ color: "var(--primary)" }}
+          className="history-card-title-icon"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -93,15 +93,15 @@ export function HistoryPanel({ entries }: Props) {
           aria-live="polite"
         >
           {trend < 0 ? (
-            <span className="under" style={{ fontWeight: 700 }}>
+            <span className="under history-trend-bold">
               ▼ Down {formatTonnes(Math.abs(trend))} since your last entry.
             </span>
           ) : trend > 0 ? (
-            <span className="over" style={{ fontWeight: 700 }}>
+            <span className="over history-trend-bold">
               ▲ Up {formatTonnes(trend)} since your last entry.
             </span>
           ) : (
-            <span style={{ fontWeight: 700 }}>No change since your last entry.</span>
+            <span className="history-trend-bold">No change since your last entry.</span>
           )}
         </div>
       )}
@@ -199,10 +199,12 @@ export function HistoryPanel({ entries }: Props) {
         <tbody>
           {entries.map((e) => (
             <tr key={e.id}>
-              <th scope="row" style={{ color: "var(--muted)", fontWeight: 500 }}>
+              <th scope="row" className="history-table-rowheader">
                 {formatDate(e.created_at)}
               </th>
-              <td style={{ fontWeight: 700 }}>{formatTonnes(e.result.total_annual_tonnes)}</td>
+              <td className="history-table-data-bold">
+                {formatTonnes(e.result.total_annual_tonnes)}
+              </td>
             </tr>
           ))}
         </tbody>

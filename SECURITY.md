@@ -28,7 +28,7 @@ All database tables enforce Supabase Row Level Security:
 | Table | Insert Policy | Select Policy | Update Policy |
 |-------|---------------|---------------|---------------|
 | `entries` | Authenticated users insert their own rows; anonymous users insert with `user_id = null` | Users see their own rows; anyone can see anonymous rows | Only for claiming anonymous history |
-| `community_tips` | Open to all (public sharing) | Open to all | N/A |
+| `community_tips` | Restricted to authenticated users (`user_id = auth.uid()`) | Open to all | N/A |
 | `profiles` | Trigger-created on signup | Public read | Users update only their own profile |
 
 ### Input Sanitization

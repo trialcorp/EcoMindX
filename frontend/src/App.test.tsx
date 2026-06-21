@@ -88,7 +88,7 @@ describe("App", () => {
     await waitFor(() => expect(screen.getByText(/your estimated footprint/i)).toBeInTheDocument());
 
     // Navigate to the AI Action Plan (insights) tab.
-    await userEvent.click(screen.getByRole("button", { name: /ai action plan/i }));
+    await userEvent.click(screen.getByRole("tab", { name: /ai action plan/i }));
 
     // Fast-forward past the 1.5s insights generation animation.
     act(() => {

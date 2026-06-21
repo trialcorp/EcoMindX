@@ -19,6 +19,7 @@ interface Props {
     authorName: string,
   ) => Promise<void>;
   onDeleteTip: (tipId: string) => Promise<void>;
+  onSignInClick: () => void;
 }
 
 export function CommunityHub({
@@ -30,6 +31,7 @@ export function CommunityHub({
   user,
   onShareTip,
   onDeleteTip,
+  onSignInClick,
 }: Props) {
   const [tipCategory, setTipCategory] = useState("home");
   const [tipTitle, setTipTitle] = useState("");
@@ -113,7 +115,7 @@ export function CommunityHub({
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          style={{ color: "var(--primary)" }}
+          className="community-card-title-icon"
         >
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
           <circle cx="9" cy="7" r="4" />
@@ -130,7 +132,7 @@ export function CommunityHub({
       )}
 
       {loadingCommunity && !leaderboardUsers.length ? (
-        <div style={{ textAlign: "center", padding: "2rem" }}>
+        <div className="community-spinner-container">
           <svg
             className="spinner"
             width="32"
@@ -142,31 +144,21 @@ export function CommunityHub({
           >
             <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p style={{ color: "var(--muted)" }}>Loading community data...</p>
+          <p className="community-spinner-note">Loading community data...</p>
         </div>
       ) : (
         <>
           <div className="community-stats-header">
             <div>
               <h3 className="community-stats-title">Collective Impact</h3>
-              <p style={{ color: "var(--muted)", margin: "0.25rem 0 0" }}>
-                Total CO₂e saved by the EcoMindX community
-              </p>
+              <p className="community-saved-note">Total CO₂e saved by the EcoMindX community</p>
             </div>
             <div className="community-stats-val">{collectiveSaved.toLocaleString()} kg</div>
           </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-              gap: "2rem",
-            }}
-          >
+          <div className="community-grid-split">
             <div>
-              <h3 style={{ fontFamily: "var(--font-display)", marginBottom: "1.25rem" }}>
-                Global Leaderboard
-              </h3>
+              <h3 className="community-section-title">Global Leaderboard</h3>
               <div className="leaderboard-container">
                 {leaderboardUsers.slice(0, 10).map((u, i) => (
                   <div
@@ -187,84 +179,69 @@ export function CommunityHub({
             </div>
 
             <div>
-              <h3 style={{ fontFamily: "var(--font-display)", marginBottom: "1.25rem" }}>
-                Share an Eco-Tip
-              </h3>
-              <form
-                onSubmit={handleShareSubmit}
-                style={{
-                  background: "rgba(255,255,255,0.02)",
-                  padding: "1.5rem",
-                  borderRadius: "12px",
-                  border: "1px solid var(--border)",
-                }}
-              >
-                {!user && (
-                  <div style={{ marginBottom: "1rem", fontSize: "0.85rem", color: "var(--muted)" }}>
-                    <strong style={{ color: "var(--primary)" }}>Note:</strong> You are sharing
-                    anonymously. Sign in to link tips to your profile.
-                  </div>
-                )}
-                <div className="field">
-                  <label htmlFor="tip-category">Category</label>
-                  <select
-                    id="tip-category"
-                    value={tipCategory}
-                    onChange={(e) => setTipCategory(e.target.value)}
-                  >
-                    <option value="home">Home Energy</option>
-                    <option value="transport">Transportation</option>
-                    <option value="diet">Diet & Food</option>
-                    <option value="consumption">Shopping & Waste</option>
-                  </select>
-                </div>
-                {!user && (
+              <h3 className="community-section-title">Share an Eco-Tip</h3>
+              {user ? (
+                <form className="community-form-card" onSubmit={handleShareSubmit}>
                   <div className="field">
-                    <label htmlFor="tip-author">Name / Handle (Optional)</label>
+                    <label htmlFor="tip-category">Category</label>
+                    <select
+                      id="tip-category"
+                      value={tipCategory}
+                      onChange={(e) => setTipCategory(e.target.value)}
+                    >
+                      <option value="home">Home Energy</option>
+                      <option value="transport">Transportation</option>
+                      <option value="diet">Diet & Food</option>
+                      <option value="consumption">Shopping & Waste</option>
+                    </select>
+                  </div>
+                  <div className="field">
+                    <label htmlFor="tip-title">Tip Title</label>
                     <input
-                      id="tip-author"
+                      id="tip-title"
                       type="text"
-                      maxLength={30}
-                      value={authorName}
-                      onChange={(e) => setAuthorName(e.target.value)}
-                      placeholder="Anonymous Eco-Warrior"
+                      required
+                      maxLength={60}
+                      value={tipTitle}
+                      onChange={(e) => setTipTitle(e.target.value)}
+                      placeholder="e.g., Wash clothes in cold water"
                     />
                   </div>
-                )}
-                <div className="field">
-                  <label htmlFor="tip-title">Tip Title</label>
-                  <input
-                    id="tip-title"
-                    type="text"
-                    required
-                    maxLength={60}
-                    value={tipTitle}
-                    onChange={(e) => setTipTitle(e.target.value)}
-                    placeholder="e.g., Wash clothes in cold water"
-                  />
+                  <div className="field">
+                    <label htmlFor="tip-desc">How does it help?</label>
+                    <input
+                      id="tip-desc"
+                      type="text"
+                      required
+                      maxLength={200}
+                      value={tipDesc}
+                      onChange={(e) => setTipDesc(e.target.value)}
+                      placeholder="Saves heating energy and protects fabric."
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="btn community-form-submit-btn"
+                    disabled={sharing}
+                  >
+                    {sharing ? "Publishing..." : "Publish Tip"}
+                  </button>
+                </form>
+              ) : (
+                <div className="community-signin-cta-card">
+                  <p className="community-signin-cta-text">
+                    Join the EcoMindX community to share your crowd-sourced eco-tips and inspire
+                    others.
+                  </p>
+                  <button className="btn" type="button" onClick={onSignInClick}>
+                    Sign In / Register
+                  </button>
                 </div>
-                <div className="field">
-                  <label htmlFor="tip-desc">How does it help?</label>
-                  <input
-                    id="tip-desc"
-                    type="text"
-                    required
-                    maxLength={200}
-                    value={tipDesc}
-                    onChange={(e) => setTipDesc(e.target.value)}
-                    placeholder="Saves heating energy and protects fabric."
-                  />
-                </div>
-                <button type="submit" className="btn" disabled={sharing} style={{ width: "100%" }}>
-                  {sharing ? "Publishing..." : "Publish Tip"}
-                </button>
-              </form>
+              )}
             </div>
           </div>
 
-          <h3 style={{ fontFamily: "var(--font-display)", margin: "2.5rem 0 1.25rem" }}>
-            Community Feed
-          </h3>
+          <h3 className="community-feed-header">Community Feed</h3>
           <div className="tips-feed">
             {communityTips.map((tip) => (
               <article key={tip.id} className="tip-card">
@@ -298,9 +275,7 @@ export function CommunityHub({
               </article>
             ))}
             {communityTips.length === 0 && (
-              <div style={{ color: "var(--muted)", fontStyle: "italic", padding: "1rem" }}>
-                No tips shared yet. Be the first!
-              </div>
+              <div className="community-feed-empty">No tips shared yet. Be the first!</div>
             )}
           </div>
         </>

@@ -61,18 +61,7 @@ export function InsightsPanel({ insights }: Props) {
 
   if (isGenerating) {
     return (
-      <section
-        className="card"
-        style={{
-          textAlign: "center",
-          padding: "4rem 2rem",
-          minHeight: "400px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
+      <section className="card insights-loading-wrapper">
         <div className="scanning-icon">
           <svg
             width="48"
@@ -83,31 +72,18 @@ export function InsightsPanel({ insights }: Props) {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{ color: "var(--primary)" }}
           >
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
         </div>
-        <h3
-          style={{
-            marginTop: "1rem",
-            color: "#fff",
-            animation: "pulseGlow 2s infinite ease-in-out",
-          }}
-        >
-          AI is analyzing your footprint...
-        </h3>
-        <p style={{ color: "var(--muted)" }}>Generating personalized reduction strategies.</p>
+        <h3>AI is analyzing your footprint...</h3>
+        <p>Generating personalized reduction strategies.</p>
       </section>
     );
   }
 
   return (
-    <section
-      className="card"
-      aria-labelledby="insights-heading"
-      style={{ animation: "fadeIn 0.5s ease-out" }}
-    >
+    <section className="card" aria-labelledby="insights-heading">
       <h2 id="insights-heading">
         <svg
           width="24"
@@ -118,7 +94,7 @@ export function InsightsPanel({ insights }: Props) {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          style={{ color: "var(--primary)" }}
+          className="insights-card-title-icon"
           xmlns="http://www.w3.org/2000/svg"
         >
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -129,9 +105,7 @@ export function InsightsPanel({ insights }: Props) {
         </span>
       </h2>
 
-      <p style={{ fontSize: "1.05rem", color: "#e5e7eb", marginBottom: "1.5rem" }}>
-        {insights.summary}
-      </p>
+      <p className="insights-intro-text">{insights.summary}</p>
 
       {/* Simulated Savings Banner */}
       {totalSimulatedSavings > 0 && (
@@ -142,30 +116,14 @@ export function InsightsPanel({ insights }: Props) {
           </div>
           <div className="simulation-value">
             -{formatKg(totalSimulatedSavings)} CO₂e / yr
-            <div
-              style={{
-                fontSize: "0.8rem",
-                color: "var(--primary)",
-                marginTop: "0.2rem",
-                textAlign: "right",
-              }}
-            >
+            <div className="insights-financial-savings-total">
               Est. savings: ~${totalFinancialSavings.toFixed(0)}/yr
             </div>
           </div>
         </div>
       )}
 
-      <h3
-        style={{
-          fontFamily: "var(--font-display)",
-          borderBottom: "1px solid var(--border)",
-          paddingBottom: "0.5rem",
-          marginBottom: "1rem",
-        }}
-      >
-        Recommended actions
-      </h3>
+      <h3 className="insights-recommendations-header">Recommended actions</h3>
       <ul className="plain-list">
         {insights.recommendations.map((rec, i) => {
           const financialSaving =
@@ -175,8 +133,6 @@ export function InsightsPanel({ insights }: Props) {
               className={`recommendation ${committed[i] ? "committed" : ""}`}
               key={`${rec.category}-${i}`}
               style={{
-                opacity: 0,
-                animation: `slideIn 0.5s ease-out forwards`,
                 animationDelay: `${i * 0.15}s`,
               }}
             >
@@ -184,9 +140,7 @@ export function InsightsPanel({ insights }: Props) {
                 <strong>{categoryLabel(rec.category)}:</strong> {rec.action}
                 <div className="saving">
                   Potential saving: {formatKg(rec.estimated_annual_savings_kg)} CO₂e / year
-                  <span
-                    style={{ color: "var(--muted)", marginLeft: "0.5rem", fontWeight: "normal" }}
-                  >
+                  <span className="insights-financial-savings">
                     (~${financialSaving.toFixed(0)})
                   </span>
                 </div>
@@ -209,48 +163,21 @@ export function InsightsPanel({ insights }: Props) {
 
       {/* Eco-Pledge Shareable Card */}
       {totalSimulatedSavings > 0 && (
-        <div
-          className="eco-pledge-card"
-          style={{
-            marginTop: "2rem",
-            padding: "1.5rem",
-            borderRadius: "12px",
-            background: "linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.2))",
-            border: "1px solid var(--primary-glow)",
-            animation: "fadeIn 0.5s ease-out",
-          }}
-        >
-          <h4
-            style={{
-              margin: "0 0 0.5rem 0",
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-            }}
-          >
+        <div className="eco-pledge-card">
+          <h4>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--primary)" stroke="none">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
             </svg>
             My Eco-Pledge
           </h4>
-          <p style={{ margin: "0 0 1rem 0", color: "var(--text)" }}>
+          <p>
             I am committing to reduce my carbon footprint by{" "}
             <strong>{formatKg(totalSimulatedSavings)} CO₂e</strong> this year, and saving roughly{" "}
             <strong>${totalFinancialSavings.toFixed(0)}</strong> in the process!
           </p>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span
-              style={{
-                fontSize: "0.8rem",
-                color: "var(--muted)",
-                fontWeight: "bold",
-                letterSpacing: "1px",
-              }}
-            >
-              POWERED BY ECOMINDX
-            </span>
-            <button className="btn" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }}>
+          <div className="eco-pledge-footer">
+            <span>POWERED BY ECOMINDX</span>
+            <button className="btn sm" type="button">
               Share Pledge
             </button>
           </div>

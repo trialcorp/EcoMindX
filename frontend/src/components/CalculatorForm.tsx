@@ -112,6 +112,7 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
       <div className="form-steps-nav" role="tablist" aria-label="Calculator steps">
         <button
           type="button"
+          id="step1-tab"
           className={`step-tab ${step === 1 ? "active" : ""}`}
           onClick={() => setStep(1)}
           role="tab"
@@ -123,6 +124,7 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
         </button>
         <button
           type="button"
+          id="step2-tab"
           className={`step-tab ${step === 2 ? "active" : ""}`}
           onClick={() => setStep(2)}
           role="tab"
@@ -134,6 +136,7 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
         </button>
         <button
           type="button"
+          id="step3-tab"
           className={`step-tab ${step === 3 ? "active" : ""}`}
           onClick={() => setStep(3)}
           role="tab"

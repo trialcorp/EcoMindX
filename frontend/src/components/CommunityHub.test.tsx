@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { CommunityHub } from "./CommunityHub";
 import { axe } from "vitest-axe";
+import type { User } from "@supabase/supabase-js";
 
 describe("CommunityHub", () => {
   const mockTips = [
@@ -34,6 +35,7 @@ describe("CommunityHub", () => {
         user={null}
         onShareTip={mockOnShare}
         onDeleteTip={mockOnDelete}
+        onSignInClick={vi.fn()}
       />,
     );
 
@@ -43,6 +45,7 @@ describe("CommunityHub", () => {
   });
 
   it("allows submitting a tip", async () => {
+    const mockUser = { id: "user-1", email: "Anonymous Eco-Warrior@example.com" };
     render(
       <CommunityHub
         leaderboardUsers={mockLeaderboard}
@@ -50,9 +53,10 @@ describe("CommunityHub", () => {
         communityTips={mockTips}
         loadingCommunity={false}
         communityError={null}
-        user={null}
+        user={mockUser as unknown as User}
         onShareTip={mockOnShare}
         onDeleteTip={mockOnDelete}
+        onSignInClick={vi.fn()}
       />,
     );
 
@@ -83,6 +87,7 @@ describe("CommunityHub", () => {
         user={null}
         onShareTip={mockOnShare}
         onDeleteTip={mockOnDelete}
+        onSignInClick={vi.fn()}
       />,
     );
     const results = await axe(container);
