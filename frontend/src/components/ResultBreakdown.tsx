@@ -2,14 +2,18 @@ import type { CarbonInput, FootprintResult } from "../lib/types";
 import { categoryLabel, formatKg, formatTonnes } from "../lib/format";
 import { useEffect, useState } from "react";
 
+/** Props for the {@link ResultBreakdown} component. */
 interface Props {
+  /** The computed footprint result containing breakdown and comparisons. */
   result: FootprintResult;
+  /** Optional original input data for the interactive detail card. */
   input?: CarbonInput | null;
 }
 
 /**
- * Redesigned Results breakdown with metric cards, circle gauge, and visual charts.
- * Preserves accessibility table and bar-row selectors for test compatibility.
+ * Rich results display with metric cards, circular sustainability gauge,
+ * animated bar chart, interactive category detail cards, and an accessible
+ * data table fallback.
  */
 export function ResultBreakdown({ result, input }: Props) {
   const entries = Object.entries(result.breakdown_kg);
@@ -59,7 +63,7 @@ export function ResultBreakdown({ result, input }: Props) {
   return (
     <section className="card" aria-labelledby="result-heading">
       <h2 id="result-heading">
-        <svg
+        <svg aria-hidden="true"
           width="24"
           height="24"
           viewBox="0 0 24 24"
@@ -128,7 +132,7 @@ export function ResultBreakdown({ result, input }: Props) {
       {/* Visual Circle Gauge & Summary */}
       <div className="gauge-responsive-split result-gauge-responsive-split">
         <div className="gauge-wrapper">
-          <svg className="gauge-svg" width="140" height="140" viewBox="0 0 120 120">
+          <svg aria-hidden="true" className="gauge-svg" width="140" height="140" viewBox="0 0 120 120">
             <circle className="gauge-bg" cx="60" cy="60" r={radius} />
             <circle
               className={`gauge-fill ${overTarget ? "over" : ""}`}
@@ -196,7 +200,7 @@ export function ResultBreakdown({ result, input }: Props) {
       {input && (
         <div className="card category-detail-card result-category-detail-card">
           <h4 className="result-category-detail-card-title">
-            <svg
+            <svg aria-hidden="true"
               width="18"
               height="18"
               viewBox="0 0 24 24"

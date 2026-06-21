@@ -5,6 +5,14 @@ import type { User } from "@supabase/supabase-js";
 /**
  * Manages Supabase authentication state: session recovery, sign-in,
  * sign-up, sign-out, and real-time auth state change listening.
+ *
+ * @returns An object containing:
+ *   - `user` — The currently authenticated Supabase user, or `null`.
+ *   - `authLoading` — Whether an auth operation is in progress.
+ *   - `authError` — The last authentication error message, or `null`.
+ *   - `signIn` — Async function to sign in with email and password.
+ *   - `signUp` — Async function to register a new account.
+ *   - `signOut` — Async function to sign out the active user.
  */
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);

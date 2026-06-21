@@ -8,6 +8,21 @@ import type { User } from "@supabase/supabase-js";
  * Owns footprint calculation, AI insights generation, entry persistence,
  * and history loading. Auth and community concerns are handled by their
  * respective hooks (`useAuth`, `useCommunity`).
+ *
+ * @param user - The currently authenticated Supabase user, or `null`.
+ * @returns An object containing:
+ *   - `result` — The latest calculated footprint result, or `null`.
+ *   - `lastInput` — The input data used for the latest calculation.
+ *   - `insights` — AI-generated or rule-based insights, or `null`.
+ *   - `entries` — Array of saved history entries.
+ *   - `loading` — Whether a calculation is in progress.
+ *   - `saving` — Whether a save/claim operation is in progress.
+ *   - `error` — Error message, or `null`.
+ *   - `status` — User-facing status message for screen readers.
+ *   - `calculate` — Runs footprint calculation and AI insights.
+ *   - `save` — Persists the latest result to history.
+ *   - `claimHistory` — Links anonymous device history to user account.
+ *   - `loadHistory` — Reloads the entry history.
  */
 export function useFootprint(user: User | null) {
   const [deviceId] = useState(getDeviceId);

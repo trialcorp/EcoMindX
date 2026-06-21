@@ -1,24 +1,34 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
+/** Props for the {@link NumberField} component. */
 interface NumberFieldProps {
+  /** Unique HTML `id` used for label association and `aria-describedby`. */
   id: string;
+  /** Visible label text displayed above the input. */
   label: string;
+  /** The current numeric value (controlled). */
   value: number;
+  /** Callback fired when the user changes the value. */
   onChange: (value: number) => void;
-  /** Upper bound, mirroring the backend schema so the browser rejects out-of-range values. */
+  /** Upper bound — the browser rejects values above this threshold. */
   max: number;
+  /** Lower bound (defaults to 0). */
   min?: number;
+  /** Increment step for the number input (defaults to `"any"`). */
   step?: number | "any";
-  /** Optional helper text, associated with the input via aria-describedby. */
+  /** Optional helper text, associated with the input via `aria-describedby`. */
   hint?: string;
 }
 
 /**
- * A labelled numeric input with consistent accessibility wiring: explicit
- * label association, optional hint exposed through `aria-describedby`, and
- * browser-level `min`/`max` bounds.
- * Handles typing inputs smoothly by keeping a local string representation,
- * preventing '0' from getting stuck when deleting or typing decimals.
+ * A labelled numeric input with consistent accessibility wiring.
+ *
+ * Features:
+ * - Explicit `<label>` association via `htmlFor`.
+ * - Optional hint text linked through `aria-describedby` for screen readers.
+ * - Browser-level `min`/`max` bounds with a companion range slider.
+ * - Smooth typing via a local string state (prevents "0" from sticking
+ *   when the user deletes or types decimal values).
  */
 export function NumberField({
   id,
@@ -38,14 +48,19 @@ export function NumberField({
     value === 0 && !id.includes("household") ? "" : value.toString(),
   );
 
+  // Use a ref to avoid listing inputValue in the effect dependency array,
+  // which would cause an infinite update loop when the external value changes.
+  const inputValueRef = useRef(inputValue);
+  inputValueRef.current = inputValue;
+
   // Keep local input in sync with external changes (e.g. from range slider or parent resets)
   useEffect(() => {
-    if (Number(inputValue) !== value) {
+    if (Number(inputValueRef.current) !== value) {
       setInputValue(value === 0 && !id.includes("household") ? "" : value.toString());
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
+  }, [value, id]);
 
+  /** Normalise the raw text on blur: clamp to valid range and reset empty to 0. */
   const handleBlur = () => {
     const parsed = parseFloat(inputValue);
     const finalVal = Number.isNaN(parsed) ? 0 : Math.max(min, Math.min(parsed, max));

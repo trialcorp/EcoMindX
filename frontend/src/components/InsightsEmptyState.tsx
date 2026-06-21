@@ -8,6 +8,12 @@ const ECO_FACTS = [
   "Reducing your thermostat by just 1 degree in winter can cut your heating bill by up to 10%.",
 ];
 
+/**
+ * Empty state placeholder for the Insights tab before footprint calculation.
+ *
+ * Displays a rotating carousel of eco-facts to keep the user engaged while
+ * encouraging them to complete the calculator wizard.
+ */
 export function InsightsEmptyState() {
   const [factIndex, setFactIndex] = useState(0);
 

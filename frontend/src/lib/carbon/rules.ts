@@ -1,3 +1,13 @@
+/**
+ * Deterministic rule-based recommendation engine.
+ *
+ * Generates actionable, prioritised carbon reduction advice without relying
+ * on external AI services. Used as the primary fallback when the Gemini Edge
+ * Function is unavailable, rate-limited, or returns an invalid response.
+ *
+ * @module rules
+ */
+
 import type {
   CarbonInput,
   FootprintResult,
@@ -5,14 +15,26 @@ import type {
   Recommendation,
   DietType,
 } from "../types";
+import { round } from "../math";
 import * as factors from "./factors";
 
-const _FLIGHT_REDUCTION_SHARE = 0.5;
-const _HOME_ENERGY_REDUCTION_SHARE = 0.33;
-const _CONSUMPTION_REDUCTION_SHARE = 0.25;
-const _GENERIC_TRANSPORT_REDUCTION_SHARE = 0.2;
+/** Share of flight emissions assumed reducible by switching to rail/video calls. */
+const FLIGHT_REDUCTION_SHARE = 0.5;
 
-const _DIET_LADDER: DietType[] = [
+/** Share of home energy assumed reducible via renewable tariffs and insulation. */
+const HOME_ENERGY_REDUCTION_SHARE = 0.33;
+
+/** Share of consumption emissions assumed reducible via buying less. */
+const CONSUMPTION_REDUCTION_SHARE = 0.25;
+
+/** Generic transport reduction share for minor commute changes. */
+const GENERIC_TRANSPORT_REDUCTION_SHARE = 0.2;
+
+/**
+ * Ordered progression of diets from highest to lowest emissions.
+ * Used to suggest the next-step-down diet change.
+ */
+const DIET_LADDER: readonly DietType[] = [
   "heavy_meat",
   "medium_meat",
   "low_meat",
@@ -21,32 +43,34 @@ const _DIET_LADDER: DietType[] = [
   "vegan",
 ];
 
-const round = (val: number, decimals: number): number => {
-  const factor = Math.pow(10, decimals);
-  return Math.round(val * factor) / factor;
-};
-
-function _transport_recommendation(data: CarbonInput, amount: number): Recommendation | null {
+/**
+ * Generate a transport-specific recommendation based on the user's travel patterns.
+ *
+ * @param data   - The full carbon input containing transport details.
+ * @param amount - The annual transport emission in kg CO₂e.
+ * @returns A targeted transport recommendation, or `null` if emissions are zero.
+ */
+function buildTransportRecommendation(data: CarbonInput, amount: number): Recommendation | null {
   const t = data.transport;
-  const flights_km =
+  const flightsKm =
     t.short_haul_flights_per_year * factors.SHORT_HAUL_TRIP_KM +
     t.long_haul_flights_per_year * factors.LONG_HAUL_TRIP_KM;
-  const car_km_year = t.car_km_per_week * factors.WEEKS_PER_YEAR;
-  const car_emissions = car_km_year * factors.CAR_FACTORS_PER_KM[t.car_fuel];
-  const flying = t.short_haul_flights_per_year + t.long_haul_flights_per_year > 0;
+  const carKmYear = t.car_km_per_week * factors.WEEKS_PER_YEAR;
+  const carEmissions = carKmYear * factors.CAR_FACTORS_PER_KM[t.car_fuel];
+  const isFlying = t.short_haul_flights_per_year + t.long_haul_flights_per_year > 0;
 
-  if (flying && flights_km * factors.FLIGHT_LONG_HAUL_PER_KM > car_emissions) {
+  if (isFlying && flightsKm * factors.FLIGHT_LONG_HAUL_PER_KM > carEmissions) {
     return {
       category: "transport",
       action:
         "Replace one or more flights per year with rail or video calls, and combine trips to halve your aviation emissions.",
-      estimated_annual_savings_kg: round(_FLIGHT_REDUCTION_SHARE * amount, 2),
+      estimated_annual_savings_kg: round(FLIGHT_REDUCTION_SHARE * amount, 2),
     };
   }
 
   if (t.car_km_per_week > 0 && t.car_fuel !== "electric") {
-    const current = car_km_year * factors.CAR_FACTORS_PER_KM[t.car_fuel];
-    const electric = car_km_year * factors.CAR_FACTORS_PER_KM["electric"];
+    const current = carKmYear * factors.CAR_FACTORS_PER_KM[t.car_fuel];
+    const electric = carKmYear * factors.CAR_FACTORS_PER_KM["electric"];
     const saving = round(current - electric, 2);
     if (saving > 0) {
       return {
@@ -62,30 +86,42 @@ function _transport_recommendation(data: CarbonInput, amount: number): Recommend
     return {
       category: "transport",
       action: "Carpool or use public transit for routine journeys to cut transport emissions.",
-      estimated_annual_savings_kg: round(_GENERIC_TRANSPORT_REDUCTION_SHARE * amount, 2),
+      estimated_annual_savings_kg: round(GENERIC_TRANSPORT_REDUCTION_SHARE * amount, 2),
     };
   }
 
   return null;
 }
 
-function _home_recommendation(amount: number): Recommendation | null {
+/**
+ * Generate a home energy recommendation.
+ *
+ * @param amount - Annual home energy emissions in kg CO₂e.
+ * @returns A home energy recommendation, or `null` if emissions are zero.
+ */
+function buildHomeRecommendation(amount: number): Recommendation | null {
   if (amount <= 0) return null;
   return {
     category: "home",
     action:
       "Switch to a renewable electricity tariff and improve insulation/thermostat settings to cut roughly a third of home energy emissions.",
-    estimated_annual_savings_kg: round(_HOME_ENERGY_REDUCTION_SHARE * amount, 2),
+    estimated_annual_savings_kg: round(HOME_ENERGY_REDUCTION_SHARE * amount, 2),
   };
 }
 
-function _diet_recommendation(data: CarbonInput): Recommendation | null {
+/**
+ * Generate a dietary recommendation by suggesting the next step down the diet ladder.
+ *
+ * @param data - The full carbon input containing the current diet type.
+ * @returns A diet recommendation, or `null` if the user is already vegan.
+ */
+function buildDietRecommendation(data: CarbonInput): Recommendation | null {
   const current = data.diet;
-  const idx = _DIET_LADDER.indexOf(current);
-  if (idx === -1 || idx >= _DIET_LADDER.length - 1) {
+  const idx = DIET_LADDER.indexOf(current);
+  if (idx === -1 || idx >= DIET_LADDER.length - 1) {
     return null;
   }
-  const target = _DIET_LADDER[idx + 1];
+  const target = DIET_LADDER[idx + 1];
   const saving = round(factors.DIET_ANNUAL_KG[current] - factors.DIET_ANNUAL_KG[target], 2);
   if (saving <= 0) return null;
   return {
@@ -95,25 +131,42 @@ function _diet_recommendation(data: CarbonInput): Recommendation | null {
   };
 }
 
-function _consumption_recommendation(amount: number): Recommendation | null {
+/**
+ * Generate a consumption and waste recommendation.
+ *
+ * @param amount - Annual consumption emissions in kg CO₂e.
+ * @returns A consumption recommendation, or `null` if emissions are zero.
+ */
+function buildConsumptionRecommendation(amount: number): Recommendation | null {
   if (amount <= 0) return null;
   return {
     category: "consumption",
     action:
       "Buy less and choose durable, second-hand or repairable goods, and reduce landfill waste by recycling and composting.",
-    estimated_annual_savings_kg: round(_CONSUMPTION_REDUCTION_SHARE * amount, 2),
+    estimated_annual_savings_kg: round(CONSUMPTION_REDUCTION_SHARE * amount, 2),
   };
 }
 
+/**
+ * Generate a complete set of rule-based insights by analysing the user's
+ * footprint breakdown and producing prioritised recommendations.
+ *
+ * Recommendations are ranked by the user's highest-emission categories first,
+ * ensuring the most impactful actions appear at the top.
+ *
+ * @param data   - The structured lifestyle input.
+ * @param result - The pre-computed footprint result with per-category breakdown.
+ * @returns An {@link InsightsResponse} with summary, recommendations, and `source: "rules"`.
+ */
 export function generateRuleBasedInsights(
   data: CarbonInput,
   result: FootprintResult,
 ): InsightsResponse {
   const builders: Record<string, (amt: number) => Recommendation | null> = {
-    transport: (amt) => _transport_recommendation(data, amt),
-    home: (amt) => _home_recommendation(amt),
-    diet: () => _diet_recommendation(data),
-    consumption: (amt) => _consumption_recommendation(amt),
+    transport: (amt) => buildTransportRecommendation(data, amt),
+    home: (amt) => buildHomeRecommendation(amt),
+    diet: () => buildDietRecommendation(data),
+    consumption: (amt) => buildConsumptionRecommendation(amt),
   };
 
   const ranked = Object.entries(result.breakdown_kg).sort((a, b) => b[1] - a[1]);

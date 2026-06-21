@@ -1,20 +1,33 @@
 import { useState, useEffect, useRef } from "react";
 import { categoryLabel } from "../lib/format";
 
+/** A gamified eco-challenge with category, difficulty, and progress state. */
 interface Challenge {
+  /** Unique challenge identifier. */
   id: string;
+  /** The emission category this challenge targets. */
   category: "diet" | "transport" | "home" | "consumption";
+  /** Short challenge title. */
   title: string;
+  /** Detailed description of the challenge requirements. */
   desc: string;
+  /** Points awarded upon completion. */
   reward: number;
+  /** Difficulty rating affecting user perception. */
   difficulty: "easy" | "medium" | "hard";
+  /** Current progress state. */
   status: "not_accepted" | "accepted" | "completed";
 }
 
+/** Level tier with name and point thresholds for the gamification system. */
 interface LevelInfo {
+  /** Numeric level (1-based). */
   level: number;
+  /** Human-readable level title. */
   name: string;
+  /** Minimum cumulative points to reach this level. */
   minPoints: number;
+  /** Points required to advance to the next level. */
   maxPoints: number;
 }
 
@@ -25,6 +38,12 @@ const LEVELS: LevelInfo[] = [
   { level: 4, name: "Sustainability Champion", minPoints: 1000, maxPoints: 99999 },
 ];
 
+/**
+ * Determine the user's current level tier based on accumulated points.
+ *
+ * @param points - Total points earned from completed challenges.
+ * @returns The matching {@link LevelInfo} tier.
+ */
 function getLevelInfo(points: number): LevelInfo {
   for (let i = LEVELS.length - 1; i >= 0; i--) {
     if (points >= LEVELS[i].minPoints) {
@@ -145,6 +164,7 @@ const DEFAULT_CHALLENGES: Challenge[] = [
   },
 ];
 
+/** Coloured pill badge displaying the challenge's emission category with an icon. */
 function CategoryPill({ category }: { category: "diet" | "transport" | "home" | "consumption" }) {
   const label = categoryLabel(category);
 
@@ -152,7 +172,7 @@ function CategoryPill({ category }: { category: "diet" | "transport" | "home" | 
     switch (category) {
       case "diet":
         return (
-          <svg
+          <svg aria-hidden="true"
             width="12"
             height="12"
             viewBox="0 0 24 24"
@@ -169,7 +189,7 @@ function CategoryPill({ category }: { category: "diet" | "transport" | "home" | 
         );
       case "transport":
         return (
-          <svg
+          <svg aria-hidden="true"
             width="12"
             height="12"
             viewBox="0 0 24 24"
@@ -188,7 +208,7 @@ function CategoryPill({ category }: { category: "diet" | "transport" | "home" | 
         );
       case "home":
         return (
-          <svg
+          <svg aria-hidden="true"
             width="12"
             height="12"
             viewBox="0 0 24 24"
@@ -203,7 +223,7 @@ function CategoryPill({ category }: { category: "diet" | "transport" | "home" | 
         );
       case "consumption":
         return (
-          <svg
+          <svg aria-hidden="true"
             width="12"
             height="12"
             viewBox="0 0 24 24"
@@ -231,12 +251,17 @@ function CategoryPill({ category }: { category: "diet" | "transport" | "home" | 
   );
 }
 
+/** Props for the {@link EcoChallenges} component. */
 interface Props {
+  /** The user's highest emission category, used to recommend relevant quests. */
   highestCategory: string | null;
 }
 
 /**
- * Eco-Challenges tab — gamified quests with level progression, filtering, and confetti.
+ * Gamified Eco-Quests panel with level progression, filtering by status,
+ * contextual recommendations, and canvas-based confetti celebrations.
+ *
+ * Challenge state is persisted in `localStorage` under `ecomindx_quests_v2`.
  */
 export function EcoChallenges({ highestCategory }: Props) {
   const [questFilter, setQuestFilter] = useState<"all" | "active" | "completed" | "recommended">(
@@ -406,8 +431,9 @@ export function EcoChallenges({ highestCategory }: Props) {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{ color: "var(--primary)" }}
+            className="icon-primary"
             xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
           >
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
           </svg>
@@ -534,7 +560,8 @@ export function EcoChallenges({ highestCategory }: Props) {
                           strokeWidth="2.5"
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          style={{ marginRight: "2px" }}
+                          className="mr-xs"
+                          aria-hidden="true"
                         >
                           <circle cx="12" cy="12" r="8" />
                           <line x1="12" y1="8" x2="12" y2="16" />

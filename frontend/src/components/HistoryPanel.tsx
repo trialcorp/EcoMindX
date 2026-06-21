@@ -1,17 +1,22 @@
 import type { Entry } from "../lib/types";
 import { formatDate, formatTonnes } from "../lib/format";
 
+/** Props for the {@link HistoryPanel} component. */
 interface Props {
+  /** Array of saved footprint entries, newest first. */
   entries: Entry[];
 }
 
-/** Tracking history ledger: lists past calculation entries and trends with a sparkline chart. */
+/**
+ * Tracking history ledger: lists past entries with trend indicators and
+ * an interactive SVG sparkline chart showing emission changes over time.
+ */
 export function HistoryPanel({ entries }: Props) {
   if (entries.length === 0) {
     return (
       <section className="card" aria-labelledby="history-heading">
         <h2 id="history-heading">
-          <svg
+          <svg aria-hidden="true"
             width="24"
             height="24"
             viewBox="0 0 24 24"
@@ -70,7 +75,7 @@ export function HistoryPanel({ entries }: Props) {
   return (
     <section className="card" aria-labelledby="history-heading">
       <h2 id="history-heading">
-        <svg
+        <svg aria-hidden="true"
           width="24"
           height="24"
           viewBox="0 0 24 24"
@@ -113,7 +118,7 @@ export function HistoryPanel({ entries }: Props) {
         >
           <h3 className="trend-chart-title">Emissions Trend</h3>
           <div className="trend-chart-svg-wrapper">
-            <svg
+            <svg aria-hidden="true"
               viewBox={`0 0 ${svgWidth} ${svgHeight}`}
               className="trend-chart-svg"
               preserveAspectRatio="none"

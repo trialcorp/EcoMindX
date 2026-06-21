@@ -5,6 +5,16 @@ import type { LeaderboardEntry, CommunityTip } from "../lib/types";
 /**
  * Manages Community Hub state: leaderboard rankings, collective CO₂e
  * savings, and crowd-sourced eco-tips (CRUD).
+ *
+ * @returns An object containing:
+ *   - `leaderboard` — Array of leaderboard entries sorted by score.
+ *   - `collectiveSaved` — Total CO₂e saved by the community in kg.
+ *   - `tips` — Array of community-shared eco-tips.
+ *   - `loadingCommunity` — Whether community data is loading.
+ *   - `communityError` — Error message, or `null`.
+ *   - `loadCommunityData` — Fetches all community data in parallel.
+ *   - `shareTip` — Publishes a new eco-tip.
+ *   - `deleteTip` — Removes a tip by ID.
  */
 export function useCommunity() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);

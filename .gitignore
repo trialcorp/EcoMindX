@@ -13,6 +13,8 @@ node_modules/
 frontend/dist/
 coverage/
 frontend/coverage/
+.env
+.env.local
 .DS_Store
 Thumbs.db
 .idea/

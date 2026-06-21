@@ -1,27 +1,44 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import type { LeaderboardEntry, CommunityTip } from "../lib/types";
 import { formatDate } from "../lib/format";
+import { MAX_TIP_TITLE_LENGTH, MAX_TIP_DESC_LENGTH, MAX_TIP_AUTHOR_LENGTH } from "../lib/constants";
 import type { User } from "@supabase/supabase-js";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { debounce } from "../lib/debounce";
 
+/** Props for the {@link CommunityHub} component. */
 interface Props {
+  /** Ranked leaderboard entries with optional current-user flag. */
   leaderboardUsers: (LeaderboardEntry & { isUser?: boolean; name?: string })[];
+  /** Total collective CO₂e saved in kg. */
   collectiveSaved: number;
+  /** Array of community-sourced eco-tips. */
   communityTips: CommunityTip[];
+  /** Whether community data is currently loading. */
   loadingCommunity: boolean;
+  /** Error message from community data loading, if any. */
   communityError: string | null;
+  /** The currently authenticated user, or `null`. */
   user: User | null;
+  /** Callback to share a new eco-tip. */
   onShareTip: (
     category: string,
     title: string,
     description: string,
     authorName: string,
   ) => Promise<void>;
+  /** Callback to delete a user's own tip. */
   onDeleteTip: (tipId: string) => Promise<void>;
+  /** Callback to navigate to the sign-in panel. */
   onSignInClick: () => void;
 }
 
+/**
+ * Community Hub — leaderboard, collective impact stats, tip sharing, and feed.
+ *
+ * Features debounced tip submission to prevent spam, DOMParser-based HTML
+ * sanitisation, and confirmation dialogs for destructive actions.
+ */
 export function CommunityHub({
   leaderboardUsers,
   collectiveSaved,
@@ -42,17 +59,18 @@ export function CommunityHub({
   // Confirm Dialog State
   const [tipToDelete, setTipToDelete] = useState<string | null>(null);
 
-  // Stronger input sanitization using DOMParser
-  const sanitizeText = (input: string) => {
+  // Stronger input sanitization using DOMParser to strip any HTML tags
+  const sanitizeText = (input: string, maxLength: number) => {
     const doc = new DOMParser().parseFromString(input, "text/html");
-    return doc.body.textContent || "";
+    const clean = doc.body.textContent || "";
+    return clean.slice(0, maxLength);
   };
 
   const submitTip = useCallback(async () => {
-    const t = sanitizeText(tipTitle.trim());
-    const d = sanitizeText(tipDesc.trim());
+    const t = sanitizeText(tipTitle.trim(), MAX_TIP_TITLE_LENGTH);
+    const d = sanitizeText(tipDesc.trim(), MAX_TIP_DESC_LENGTH);
     const a =
-      sanitizeText(authorName.trim()) ||
+      sanitizeText(authorName.trim(), MAX_TIP_AUTHOR_LENGTH) ||
       (user ? user.email?.split("@")[0] || "Anonymous" : "Anonymous Eco-Warrior");
 
     if (!t || !d) return;

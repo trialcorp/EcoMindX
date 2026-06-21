@@ -2,14 +2,17 @@ import { useState, useEffect } from "react";
 import type { InsightsResponse } from "../lib/types";
 import { categoryLabel, formatKg } from "../lib/format";
 
+/** Props for the {@link InsightsPanel} component. */
 interface Props {
+  /** The AI-generated or rule-based insights response. */
   insights: InsightsResponse;
 }
 
 /**
- * Redesigned InsightsPanel component.
- * Includes interactive commitments checklist allowing users to simulate carbon savings.
- * Keeps standard list and text nodes for vitest compatibility.
+ * Personalized insights panel with interactive commitment checkboxes.
+ *
+ * Users can toggle recommendations to simulate projected annual CO₂e
+ * and financial savings. Includes an "Eco-Pledge" card for sharing.
  */
 export function InsightsPanel({ insights }: Props) {
   const [committed, setCommitted] = useState<Record<number, boolean>>({});

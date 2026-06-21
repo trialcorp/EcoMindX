@@ -1,10 +1,15 @@
 import type { FootprintResult, CarbonInput } from "../lib/types";
 import { ResultBreakdown } from "./ResultBreakdown";
 
+/** Props for the {@link AnalyticsTab} component. */
 interface Props {
+  /** The computed footprint result, or `null` if no assessment yet. */
   result: FootprintResult | null;
+  /** The original lifestyle input data, or `null`. */
   lastInput: CarbonInput | null;
+  /** Whether a save operation is in progress. */
   saving: boolean;
+  /** Callback to persist the current result to history. */
   onSave: () => void;
 }
 
@@ -14,15 +19,15 @@ interface Props {
 export function AnalyticsTab({ result, lastInput, saving, onSave }: Props) {
   if (!result) {
     return (
-      <div className="card" style={{ textAlign: "center", padding: "3rem 2rem" }}>
-        <svg
+      <div className="card text-center py-xl">
+        <svg aria-hidden="true"
           width="64"
           height="64"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.5"
-          style={{ color: "var(--muted)", marginBottom: "1rem" }}
+          className="icon-muted mb-m"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
@@ -31,17 +36,10 @@ export function AnalyticsTab({ result, lastInput, saving, onSave }: Props) {
             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
           />
         </svg>
-        <h2
-          style={{
-            border: "none",
-            padding: 0,
-            margin: "0 0 0.5rem 0",
-            justifyContent: "center",
-          }}
-        >
+        <h2 className="m-0" style={{ border: "none", padding: 0, justifyContent: "center" }}>
           No Assessment Data
         </h2>
-        <p style={{ color: "var(--muted)", margin: 0 }}>
+        <p className="text-muted m-0">
           Please complete your annual footprint assessment first in the Carbon Calculator tab.
         </p>
       </div>
@@ -51,21 +49,17 @@ export function AnalyticsTab({ result, lastInput, saving, onSave }: Props) {
   return (
     <>
       <ResultBreakdown result={result} input={lastInput} />
-      <div
-        className="card"
-        style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}
-      >
+      <div className="card flex-end mt-m">
         <button className="btn secondary" onClick={onSave} disabled={saving} aria-busy={saving}>
           {saving ? (
             <>
-              <svg
-                className="spinner"
+              <svg aria-hidden="true"
+                className="spinner mr-s"
                 width="16"
                 height="16"
                 viewBox="0 0 16 16"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                style={{ marginRight: "0.5rem" }}
               >
                 <circle
                   cx="8"

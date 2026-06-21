@@ -1,7 +1,22 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
+/**
+ * EcoMindX Insights Edge Function
+ *
+ * Receives a user's carbon footprint input and calculated result, then
+ * generates personalised reduction recommendations via Google Gemini AI.
+ *
+ * Security measures:
+ * - CORS origin allowlist
+ * - Request body size limit (100 KB)
+ * - Structured JSON response schema prevents prompt injection
+ * - Server-side API key storage (never exposed to client)
+ * - Numeric input validation with bounds clamping
+ */
+
 const ALLOWED_ORIGINS = ["http://localhost:5173", "https://ecomindx.vercel.app"];
 
+/** Build CORS headers, restricting Access-Control-Allow-Origin to the allowlist. */
 const getCorsHeaders = (req: Request) => {
   const origin = req.headers.get("Origin");
   const isAllowed = origin && ALLOWED_ORIGINS.includes(origin);
@@ -57,14 +72,103 @@ interface InsightsResponse {
   source: "gemini" | "rules";
 }
 
+/** Round a number to a given number of decimal places. */
 const round = (val: number, decimals: number): number => {
   const factor = Math.pow(10, decimals);
   return Math.round(val * factor) / factor;
 };
 
+/** Clamp a number to the closed interval [min, max]. */
+const clamp = (val: number, min: number, max: number): number =>
+  Math.max(min, Math.min(val, max));
+
+// --- Validation Constants (mirrors frontend/src/lib/constants.ts) ---
+const MAX_KM_PER_WEEK = 20_000;
+const MAX_FLIGHTS_PER_YEAR = 200;
+const MAX_KWH_PER_MONTH = 100_000;
+const MAX_HOUSEHOLD_SIZE = 50;
+const MAX_USD_PER_MONTH = 1_000_000;
+const MAX_WASTE_KG_PER_WEEK = 1_000;
+
+const VALID_FUELS = ["petrol", "diesel", "hybrid", "electric"];
+const VALID_DIETS = [
+  "heavy_meat",
+  "medium_meat",
+  "low_meat",
+  "pescatarian",
+  "vegetarian",
+  "vegan",
+];
+
+/**
+ * Validate and sanitise the input data by clamping numeric values to
+ * their expected ranges and verifying enum fields.
+ *
+ * @throws {Error} If required fields are missing or contain invalid enums.
+ */
+function validateAndSanitiseInput(data: CarbonInput): CarbonInput {
+  if (!data.transport || !data.home || !data.diet || !data.consumption) {
+    throw new Error("Incomplete input data: transport, home, diet, and consumption are required");
+  }
+
+  if (!VALID_FUELS.includes(data.transport.car_fuel)) {
+    throw new Error(`Invalid car fuel type: ${data.transport.car_fuel}`);
+  }
+
+  if (!VALID_DIETS.includes(data.diet)) {
+    throw new Error(`Invalid diet type: ${data.diet}`);
+  }
+
+  return {
+    transport: {
+      car_km_per_week: clamp(Number(data.transport.car_km_per_week) || 0, 0, MAX_KM_PER_WEEK),
+      car_fuel: data.transport.car_fuel,
+      public_transit_km_per_week: clamp(
+        Number(data.transport.public_transit_km_per_week) || 0,
+        0,
+        MAX_KM_PER_WEEK,
+      ),
+      short_haul_flights_per_year: clamp(
+        Number(data.transport.short_haul_flights_per_year) || 0,
+        0,
+        MAX_FLIGHTS_PER_YEAR,
+      ),
+      long_haul_flights_per_year: clamp(
+        Number(data.transport.long_haul_flights_per_year) || 0,
+        0,
+        MAX_FLIGHTS_PER_YEAR,
+      ),
+    },
+    home: {
+      electricity_kwh_per_month: clamp(
+        Number(data.home.electricity_kwh_per_month) || 0,
+        0,
+        MAX_KWH_PER_MONTH,
+      ),
+      natural_gas_kwh_per_month: clamp(
+        Number(data.home.natural_gas_kwh_per_month) || 0,
+        0,
+        MAX_KWH_PER_MONTH,
+      ),
+      household_size: clamp(Number(data.home.household_size) || 1, 1, MAX_HOUSEHOLD_SIZE),
+    },
+    diet: data.diet,
+    consumption: {
+      goods_spend_usd_per_month: clamp(
+        Number(data.consumption.goods_spend_usd_per_month) || 0,
+        0,
+        MAX_USD_PER_MONTH,
+      ),
+      waste_kg_per_week: clamp(
+        Number(data.consumption.waste_kg_per_week) || 0,
+        0,
+        MAX_WASTE_KG_PER_WEEK,
+      ),
+    },
+  };
+}
+
 // --- Main Handler ---
-// Note: Fallback rules engine is handled strictly by the client (api.ts) to avoid DRY violations.
-// This edge function only attempts Gemini AI generation and returns 503 if unavailable.
 Deno.serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
 
@@ -83,26 +187,32 @@ Deno.serve(async (req: Request) => {
     }
 
     const body = await req.json();
-    const { data, result } = body as { data: CarbonInput; result: FootprintResult };
+    const { data: rawData, result } = body as { data: CarbonInput; result: FootprintResult };
 
-    if (!data || !result) {
+    if (!rawData || !result) {
       throw new Error("Missing 'data' or 'result' in request body");
     }
 
-    // Validate required nested fields
-    if (!data.transport || !data.home || !data.diet || !data.consumption) {
-      throw new Error("Incomplete input data: transport, home, diet, and consumption are required");
-    }
+    // Validate and sanitise all input fields with server-side bounds checking
+    const data = validateAndSanitiseInput(rawData);
+
+    // Validate result structure
     if (!result.breakdown_kg || typeof result.total_annual_kg !== "number") {
       throw new Error("Incomplete result data: breakdown_kg and total_annual_kg are required");
     }
 
     const apiKey = Deno.env.get("GEMINI_API_KEY");
     if (!apiKey) {
-      console.log("No GEMINI_API_KEY environment variable set. Falling back to rules engine.");
-      return new Response(JSON.stringify(generateRuleBasedInsights(data, result)), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      // No API key configured — return 503 so the client uses its local rules fallback.
+      // The fallback rules engine lives in the client (api.ts) to avoid DRY violations.
+      console.log("No GEMINI_API_KEY environment variable set. Returning 503 for client fallback.");
+      return new Response(
+        JSON.stringify({ error: "AI service not configured" }),
+        {
+          status: 503,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     }
 
     const prompt = `Carbon footprint breakdown (kg CO2e per year):

@@ -3,16 +3,27 @@ import type { Entry } from "../lib/types";
 import type { User } from "@supabase/supabase-js";
 import { isSupabaseConfigured } from "../lib/supabaseClient";
 
+/** Props for the {@link AccountPanel} component. */
 interface Props {
+  /** The currently authenticated Supabase user, or `null`. */
   user: User | null;
+  /** Whether an auth operation is in progress. */
   authLoading: boolean;
+  /** The last authentication error message, or `null`. */
   authError: string | null;
+  /** Array of saved footprint entries for this user/device. */
   entries: Entry[];
+  /** Whether a save/claim operation is in progress. */
   saving: boolean;
+  /** The user's current emissions score in tonnes, or `null`. */
   userEmissions: number | null;
+  /** Callback to sign in with email and password. */
   onSignIn: (email: string, password: string) => Promise<void>;
+  /** Callback to register a new account. */
   onSignUp: (email: string, password: string) => Promise<void>;
+  /** Callback to sign out the active user. */
   onSignOut: () => Promise<void>;
+  /** Callback to claim anonymous device history. */
   onClaimHistory: () => Promise<void>;
 }
 
@@ -74,9 +85,9 @@ export function AccountPanel({
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{ color: "var(--primary)" }}
-            xmlns="http://www.w3.org/2000/svg"
-          >
+          className="icon-primary"
+          xmlns="http://www.w3.org/2000/svg"
+        >
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
             <circle cx="12" cy="7" r="4" />
           </svg>
@@ -102,17 +113,16 @@ export function AccountPanel({
             </div>
             <button
               type="button"
-              className="btn"
+              className="btn btn-small"
               onClick={onClaimHistory}
               disabled={saving}
-              style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }}
             >
               {saving ? "Syncing..." : "Sync History"}
             </button>
           </div>
         )}
 
-        <div className="dashboard-metrics-grid" style={{ marginBottom: "1.5rem" }}>
+        <div className="dashboard-metrics-grid mb-l">
           <div className="metric-card">
             <span className="label">Saved Snapshots</span>
             <span className="value">
@@ -127,7 +137,7 @@ export function AccountPanel({
           </div>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <div className="flex-end">
           <button
             type="button"
             className="btn secondary"
@@ -149,17 +159,10 @@ export function AccountPanel({
           {isSignUp ? "Already have an account?" : "New to EcoMindX?"}{" "}
           <button
             type="button"
-            className="auth-toggle-link"
+            className="auth-toggle-btn"
             onClick={() => {
               setIsSignUp(!isSignUp);
               setLocalAuthError(null);
-            }}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: 0,
-              font: "inherit",
             }}
           >
             {isSignUp ? "Sign In" : "Register"}
@@ -171,16 +174,7 @@ export function AccountPanel({
       {authError && !localAuthError && <div className="auth-error-alert">{authError}</div>}
 
       {!isSupabaseConfigured && (
-        <div
-          className="auth-error-alert"
-          style={{
-            background: "rgba(239, 68, 68, 0.1)",
-            border: "1px solid rgb(239, 68, 68)",
-            color: "rgb(252, 165, 165)",
-            marginTop: "1rem",
-            marginBottom: "1rem",
-          }}
-        >
+        <div className="auth-error-alert auth-error-setup">
           <strong>Setup Required:</strong> Vercel is missing your Supabase keys. You must add{" "}
           <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> in your Vercel
           Project Settings &gt; Environment Variables, and redeploy.
@@ -219,13 +213,12 @@ export function AccountPanel({
             {authLoading ? (
               <>
                 <svg
-                  className="spinner"
+                  className="spinner mr-s"
                   width="16"
                   height="16"
                   viewBox="0 0 16 16"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
-                  style={{ marginRight: "0.5rem" }}
                 >
                   <circle
                     cx="8"
