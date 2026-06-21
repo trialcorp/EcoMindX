@@ -1510,6 +1510,12 @@ export default function App() {
                   <div className="auth-error-alert">{authError}</div>
                 )}
 
+                {!isSupabaseConfigured && (
+                  <div className="auth-error-alert" style={{ background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgb(239, 68, 68)", color: "rgb(252, 165, 165)", marginTop: "1rem", marginBottom: "1rem" }}>
+                    <strong>Setup Required:</strong> Vercel is missing your Supabase keys. You must add <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> in your Vercel Project Settings &gt; Environment Variables, and redeploy.
+                  </div>
+                )}
+
                 <form onSubmit={handleAuthSubmit}>
                   <div className="field">
                     <label htmlFor="auth-email">Email Address</label>

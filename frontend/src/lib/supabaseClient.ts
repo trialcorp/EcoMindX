@@ -3,7 +3,9 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://placeholder-url.supabase.co";
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "placeholder-key";
 
-if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+export const isSupabaseConfigured = supabaseUrl !== "https://placeholder-url.supabase.co" && supabaseAnonKey !== "placeholder-key";
+
+if (!isSupabaseConfigured) {
   console.warn("Supabase URL or Anon Key is missing in environment variables. Using placeholders.");
 }
 
