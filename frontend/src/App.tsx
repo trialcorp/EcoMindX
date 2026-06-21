@@ -4,6 +4,7 @@ import { ResultBreakdown } from "./components/ResultBreakdown";
 import { InsightsPanel } from "./components/InsightsPanel";
 import { HistoryPanel } from "./components/HistoryPanel";
 import { useFootprint } from "./hooks/useFootprint";
+import { isSupabaseConfigured } from "./lib/supabaseClient";
 import { categoryLabel } from "./lib/format";
 
 type TabType =
