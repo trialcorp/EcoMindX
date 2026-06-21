@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import type { LeaderboardEntry, CommunityTip } from "../lib/types";
 import { formatDate } from "../lib/format";
 import type { User } from "@supabase/supabase-js";
@@ -36,20 +36,22 @@ export function CommunityHub({
   const [tipDesc, setTipDesc] = useState("");
   const [authorName, setAuthorName] = useState("");
   const [sharing, setSharing] = useState(false);
-  
+
   // Confirm Dialog State
   const [tipToDelete, setTipToDelete] = useState<string | null>(null);
 
   // Stronger input sanitization using DOMParser
   const sanitizeText = (input: string) => {
-    const doc = new DOMParser().parseFromString(input, 'text/html');
+    const doc = new DOMParser().parseFromString(input, "text/html");
     return doc.body.textContent || "";
   };
 
-  const submitTip = async () => {
+  const submitTip = useCallback(async () => {
     const t = sanitizeText(tipTitle.trim());
     const d = sanitizeText(tipDesc.trim());
-    const a = sanitizeText(authorName.trim()) || (user ? user.email?.split("@")[0] || "Anonymous" : "Anonymous Eco-Warrior");
+    const a =
+      sanitizeText(authorName.trim()) ||
+      (user ? user.email?.split("@")[0] || "Anonymous" : "Anonymous Eco-Warrior");
 
     if (!t || !d) return;
 
@@ -64,10 +66,10 @@ export function CommunityHub({
     } finally {
       setSharing(false);
     }
-  };
+  }, [tipTitle, tipDesc, authorName, user, onShareTip, tipCategory]);
 
   // Debounced version to prevent rapid-fire spam
-  const debouncedSubmit = useMemo(() => debounce(submitTip, 500), [tipCategory, tipTitle, tipDesc, authorName, user, onShareTip]);
+  const debouncedSubmit = useMemo(() => debounce(submitTip, 500), [submitTip]);
 
   // Clean up debounce on unmount
   useEffect(() => {
@@ -129,7 +131,15 @@ export function CommunityHub({
 
       {loadingCommunity && !leaderboardUsers.length ? (
         <div style={{ textAlign: "center", padding: "2rem" }}>
-          <svg className="spinner" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2">
+          <svg
+            className="spinner"
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="var(--primary)"
+            strokeWidth="2"
+          >
             <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <p style={{ color: "var(--muted)" }}>Loading community data...</p>
@@ -191,7 +201,8 @@ export function CommunityHub({
               >
                 {!user && (
                   <div style={{ marginBottom: "1rem", fontSize: "0.85rem", color: "var(--muted)" }}>
-                    <strong style={{ color: "var(--primary)" }}>Note:</strong> You are sharing anonymously. Sign in to link tips to your profile.
+                    <strong style={{ color: "var(--primary)" }}>Note:</strong> You are sharing
+                    anonymously. Sign in to link tips to your profile.
                   </div>
                 )}
                 <div className="field">
@@ -266,7 +277,14 @@ export function CommunityHub({
                       title="Delete your tip"
                       aria-label="Delete this tip"
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
                         <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" />
                       </svg>
                     </button>

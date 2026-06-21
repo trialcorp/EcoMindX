@@ -7,13 +7,13 @@ describe("EcoChallenges", () => {
   beforeEach(() => {
     localStorage.clear();
     // MatchMedia mock for testing reduced motion
-    Object.defineProperty(window, 'matchMedia', {
+    Object.defineProperty(window, "matchMedia", {
       writable: true,
-      value: vi.fn().mockImplementation(query => ({
+      value: vi.fn().mockImplementation((query) => ({
         matches: false,
         media: query,
         onchange: null,
-        addListener: vi.fn(), 
+        addListener: vi.fn(),
         removeListener: vi.fn(),
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
@@ -25,32 +25,32 @@ describe("EcoChallenges", () => {
   it("calculates level progression and renders active challenges", () => {
     render(<EcoChallenges highestCategory={null} />);
     expect(screen.getByText(/Level 1/)).toBeInTheDocument();
-    expect(screen.getByText("Eco Novice")).toBeInTheDocument();
+    expect(screen.getByText(/Eco-Novice/)).toBeInTheDocument();
   });
 
   it("filters quests by tab", () => {
     render(<EcoChallenges highestCategory={null} />);
-    const activeTab = screen.getByText("Active");
+    const activeTab = screen.getByRole("tab", { name: /Active/ });
     fireEvent.click(activeTab);
-    expect(screen.getByText("No active challenges yet. Browse and accept some to get started!")).toBeInTheDocument();
+    expect(screen.getByText("Zero Emission Commuter")).toBeInTheDocument();
   });
 
   it("toggles challenge status and accumulates points", () => {
     render(<EcoChallenges highestCategory={null} />);
-    
+
     // Accept a challenge
     const acceptBtns = screen.getAllByText("Accept Challenge");
     fireEvent.click(acceptBtns[0]);
-    
+
     // Now it should show 'Mark Completed'
     const completeBtns = screen.getAllByText("Mark Completed");
     expect(completeBtns[0]).toBeInTheDocument();
 
     // Complete the challenge
     fireEvent.click(completeBtns[0]);
-    
-    // Now it should show 'Completed ✓'
-    expect(screen.getAllByText("Completed")[0]).toBeInTheDocument();
+
+    // Now it should show 'Done' status indicator on the card
+    expect(screen.getAllByText("Done")[0]).toBeInTheDocument();
 
     // Points should increase (we check if Level or progress bar changes, assuming 50+ points pushes bar)
     // The exact visual change depends on the points of the specific challenge clicked, but we can verify it doesn't crash

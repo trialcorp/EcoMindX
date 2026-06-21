@@ -25,19 +25,38 @@ describe("AnalyticsTab", () => {
   });
 
   it("renders breakdown when result is provided", () => {
-    render(<AnalyticsTab result={mockResult} lastInput={emptyInput()} saving={false} onSave={mockOnSave} />);
+    render(
+      <AnalyticsTab
+        result={mockResult}
+        lastInput={emptyInput()}
+        saving={false}
+        onSave={mockOnSave}
+      />,
+    );
     expect(screen.getByText(/Your estimated footprint/)).toBeInTheDocument();
   });
 
   it("calls onSave when save button is clicked", () => {
-    render(<AnalyticsTab result={mockResult} lastInput={emptyInput()} saving={false} onSave={mockOnSave} />);
+    render(
+      <AnalyticsTab
+        result={mockResult}
+        lastInput={emptyInput()}
+        saving={false}
+        onSave={mockOnSave}
+      />,
+    );
     fireEvent.click(screen.getByText("Save this entry to my history"));
     expect(mockOnSave).toHaveBeenCalled();
   });
 
   it("passes accessibility checks", async () => {
     const { container } = render(
-      <AnalyticsTab result={mockResult} lastInput={emptyInput()} saving={false} onSave={mockOnSave} />
+      <AnalyticsTab
+        result={mockResult}
+        lastInput={emptyInput()}
+        saving={false}
+        onSave={mockOnSave}
+      />,
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();

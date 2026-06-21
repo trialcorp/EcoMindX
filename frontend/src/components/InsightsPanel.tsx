@@ -33,11 +33,16 @@ export function InsightsPanel({ insights }: Props) {
 
   const getFinancialMultiplier = (category: string) => {
     switch (category) {
-      case "transport": return 0.50;
-      case "home": return 0.15;
-      case "consumption": return 0.20;
-      case "diet": return 0.30;
-      default: return 0.25;
+      case "transport":
+        return 0.5;
+      case "home":
+        return 0.15;
+      case "consumption":
+        return 0.2;
+      case "diet":
+        return 0.3;
+      default:
+        return 0.25;
     }
   };
 
@@ -46,25 +51,63 @@ export function InsightsPanel({ insights }: Props) {
   }, 0);
 
   const totalFinancialSavings = insights.recommendations.reduce((sum, rec, index) => {
-    return sum + (committed[index] ? rec.estimated_annual_savings_kg * getFinancialMultiplier(rec.category) : 0);
+    return (
+      sum +
+      (committed[index]
+        ? rec.estimated_annual_savings_kg * getFinancialMultiplier(rec.category)
+        : 0)
+    );
   }, 0);
 
   if (isGenerating) {
     return (
-      <section className="card" style={{ textAlign: "center", padding: "4rem 2rem", minHeight: "400px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+      <section
+        className="card"
+        style={{
+          textAlign: "center",
+          padding: "4rem 2rem",
+          minHeight: "400px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <div className="scanning-icon">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--primary)" }}>
+          <svg
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ color: "var(--primary)" }}
+          >
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
         </div>
-        <h3 style={{ marginTop: "1rem", color: "#fff", animation: "pulseGlow 2s infinite ease-in-out" }}>AI is analyzing your footprint...</h3>
+        <h3
+          style={{
+            marginTop: "1rem",
+            color: "#fff",
+            animation: "pulseGlow 2s infinite ease-in-out",
+          }}
+        >
+          AI is analyzing your footprint...
+        </h3>
         <p style={{ color: "var(--muted)" }}>Generating personalized reduction strategies.</p>
       </section>
     );
   }
 
   return (
-    <section className="card" aria-labelledby="insights-heading" style={{ animation: "fadeIn 0.5s ease-out" }}>
+    <section
+      className="card"
+      aria-labelledby="insights-heading"
+      style={{ animation: "fadeIn 0.5s ease-out" }}
+    >
       <h2 id="insights-heading">
         <svg
           width="24"
@@ -99,7 +142,14 @@ export function InsightsPanel({ insights }: Props) {
           </div>
           <div className="simulation-value">
             -{formatKg(totalSimulatedSavings)} CO₂e / yr
-            <div style={{ fontSize: "0.8rem", color: "var(--primary)", marginTop: "0.2rem", textAlign: "right" }}>
+            <div
+              style={{
+                fontSize: "0.8rem",
+                color: "var(--primary)",
+                marginTop: "0.2rem",
+                textAlign: "right",
+              }}
+            >
               Est. savings: ~${totalFinancialSavings.toFixed(0)}/yr
             </div>
           </div>
@@ -118,18 +168,27 @@ export function InsightsPanel({ insights }: Props) {
       </h3>
       <ul className="plain-list">
         {insights.recommendations.map((rec, i) => {
-          const financialSaving = rec.estimated_annual_savings_kg * getFinancialMultiplier(rec.category);
+          const financialSaving =
+            rec.estimated_annual_savings_kg * getFinancialMultiplier(rec.category);
           return (
             <li
               className={`recommendation ${committed[i] ? "committed" : ""}`}
               key={`${rec.category}-${i}`}
-              style={{ opacity: 0, animation: `slideIn 0.5s ease-out forwards`, animationDelay: `${i * 0.15}s` }}
+              style={{
+                opacity: 0,
+                animation: `slideIn 0.5s ease-out forwards`,
+                animationDelay: `${i * 0.15}s`,
+              }}
             >
               <div className="recommendation-content">
                 <strong>{categoryLabel(rec.category)}:</strong> {rec.action}
                 <div className="saving">
-                  Potential saving: {formatKg(rec.estimated_annual_savings_kg)} CO₂e / year 
-                  <span style={{ color: "var(--muted)", marginLeft: "0.5rem", fontWeight: "normal" }}>(~${financialSaving.toFixed(0)})</span>
+                  Potential saving: {formatKg(rec.estimated_annual_savings_kg)} CO₂e / year
+                  <span
+                    style={{ color: "var(--muted)", marginLeft: "0.5rem", fontWeight: "normal" }}
+                  >
+                    (~${financialSaving.toFixed(0)})
+                  </span>
                 </div>
               </div>
               <div className="commit-checkbox-wrapper">
@@ -150,17 +209,50 @@ export function InsightsPanel({ insights }: Props) {
 
       {/* Eco-Pledge Shareable Card */}
       {totalSimulatedSavings > 0 && (
-        <div className="eco-pledge-card" style={{ marginTop: "2rem", padding: "1.5rem", borderRadius: "12px", background: "linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.2))", border: "1px solid var(--primary-glow)", animation: "fadeIn 0.5s ease-out" }}>
-          <h4 style={{ margin: "0 0 0.5rem 0", color: "#fff", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--primary)" stroke="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        <div
+          className="eco-pledge-card"
+          style={{
+            marginTop: "2rem",
+            padding: "1.5rem",
+            borderRadius: "12px",
+            background: "linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.2))",
+            border: "1px solid var(--primary-glow)",
+            animation: "fadeIn 0.5s ease-out",
+          }}
+        >
+          <h4
+            style={{
+              margin: "0 0 0.5rem 0",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--primary)" stroke="none">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+            </svg>
             My Eco-Pledge
           </h4>
           <p style={{ margin: "0 0 1rem 0", color: "var(--text)" }}>
-            I am committing to reduce my carbon footprint by <strong>{formatKg(totalSimulatedSavings)} CO₂e</strong> this year, and saving roughly <strong>${totalFinancialSavings.toFixed(0)}</strong> in the process!
+            I am committing to reduce my carbon footprint by{" "}
+            <strong>{formatKg(totalSimulatedSavings)} CO₂e</strong> this year, and saving roughly{" "}
+            <strong>${totalFinancialSavings.toFixed(0)}</strong> in the process!
           </p>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: "0.8rem", color: "var(--muted)", fontWeight: "bold", letterSpacing: "1px" }}>POWERED BY ECOMINDX</span>
-            <button className="btn" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }}>Share Pledge</button>
+            <span
+              style={{
+                fontSize: "0.8rem",
+                color: "var(--muted)",
+                fontWeight: "bold",
+                letterSpacing: "1px",
+              }}
+            >
+              POWERED BY ECOMINDX
+            </span>
+            <button className="btn" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }}>
+              Share Pledge
+            </button>
           </div>
         </div>
       )}

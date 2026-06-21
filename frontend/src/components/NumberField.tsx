@@ -44,8 +44,6 @@ export function NumberField({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
-
-
   const handleBlur = () => {
     // Revert/format local state to the official number value on blur (e.g. converts empty back to "0")
     setInputValue(value.toString());

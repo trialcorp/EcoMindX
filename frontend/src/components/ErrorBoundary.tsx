@@ -44,8 +44,7 @@ export class ErrorBoundary extends Component<Props, State> {
             minHeight: "100vh",
             padding: "2rem",
             textAlign: "center",
-            fontFamily:
-              '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+            fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif',
             color: "#f3f4f6",
           }}
         >
@@ -64,9 +63,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <line x1="12" y1="8" x2="12" y2="12" />
             <line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
-          <h2 style={{ margin: "0 0 0.5rem", fontSize: "1.5rem" }}>
-            Something went wrong
-          </h2>
+          <h2 style={{ margin: "0 0 0.5rem", fontSize: "1.5rem" }}>Something went wrong</h2>
           <p style={{ color: "#9ca3af", maxWidth: "400px", margin: "0 0 1.5rem" }}>
             An unexpected error occurred. Please try reloading the page.
           </p>

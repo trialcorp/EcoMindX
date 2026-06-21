@@ -36,7 +36,13 @@ export function useCommunity() {
 
   /** Share a new eco-tip and refresh the feed. */
   const shareTip = useCallback(
-    async (category: string, title: string, description: string, authorName: string, userId?: string) => {
+    async (
+      category: string,
+      title: string,
+      description: string,
+      authorName: string,
+      userId?: string,
+    ) => {
       setLoadingCommunity(true);
       setCommunityError(null);
       try {

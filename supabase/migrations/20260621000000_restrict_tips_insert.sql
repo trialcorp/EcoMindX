@@ -6,7 +6,7 @@
 -- The app currently doesn't mandate auth to post tips, but requires an author_name.
 -- To prevent total spam, we will only allow authenticated users to post.
 
-DROP POLICY IF EXISTS "Anyone can insert a tip" ON public.community_tips;
+DROP POLICY IF EXISTS "Allow authenticated/anon insert community_tips" ON public.community_tips;
 
 CREATE POLICY "Authenticated users can insert tips"
 ON public.community_tips

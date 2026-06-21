@@ -152,7 +152,16 @@ function CategoryPill({ category }: { category: "diet" | "transport" | "home" | 
     switch (category) {
       case "diet":
         return (
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M12 2c5.522 0 10 4.477 10 10S17.522 22 12 22 2 17.522 2 12 6.478 2 12 2z" />
             <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z" />
             <path d="M12 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
@@ -160,7 +169,16 @@ function CategoryPill({ category }: { category: "diet" | "transport" | "home" | 
         );
       case "transport":
         return (
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M5.5 17.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" />
             <path d="M18.5 17.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" />
             <path d="M12 5v14" />
@@ -170,13 +188,31 @@ function CategoryPill({ category }: { category: "diet" | "transport" | "home" | 
         );
       case "home":
         return (
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
           </svg>
         );
       case "consumption":
         return (
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
             <line x1="3" y1="6" x2="21" y2="6" />
             <path d="M16 10a4 4 0 0 1-8 0" />
@@ -237,7 +273,7 @@ export function EcoChallenges({ highestCategory }: Props) {
 
     if (!confettiCanvasRef.current) return;
     const canvas = confettiCanvasRef.current;
-    
+
     // Explicitly hide from screen readers
     canvas.setAttribute("aria-hidden", "true");
 
@@ -359,7 +395,7 @@ export function EcoChallenges({ highestCategory }: Props) {
 
   return (
     <>
-      <section className="card" role="region" aria-label="Eco-Challenges">
+      <section className="card" aria-label="Eco-Challenges">
         <h2>
           <svg
             width="24"
@@ -517,9 +553,7 @@ export function EcoChallenges({ highestCategory }: Props) {
 
                   <div className="challenge-title-group">
                     {isRecommended && (
-                      <span className="challenge-recommended-badge">
-                        ✨ Recommended for You
-                      </span>
+                      <span className="challenge-recommended-badge">✨ Recommended for You</span>
                     )}
                     <h3 className="challenge-title">{quest.title}</h3>
                   </div>

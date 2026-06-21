@@ -39,7 +39,7 @@ describe("HistoryPanel", () => {
           ratio_to_sustainable_target: 2.5,
         },
       },
-    }
+    },
   ];
 
   it("renders empty state", () => {
@@ -53,7 +53,7 @@ describe("HistoryPanel", () => {
     expect(screen.getByText(/▼ Down/)).toBeInTheDocument();
     expect(screen.getByText("4 t")).toBeInTheDocument();
     expect(screen.getByText("5 t")).toBeInTheDocument();
-    
+
     // Check if the trend chart title rendered
     expect(screen.getByText("Emissions Trend")).toBeInTheDocument();
   });

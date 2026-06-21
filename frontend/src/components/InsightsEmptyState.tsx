@@ -5,7 +5,7 @@ const ECO_FACTS = [
   "A plant-based diet can reduce your food-related carbon footprint by up to 73%.",
   "Carpooling just twice a week can keep 1,500 pounds of greenhouse gases out of the air each year.",
   "Unplugging idle electronics can save you up to $100 a year and reduce phantom energy loads.",
-  "Reducing your thermostat by just 1 degree in winter can cut your heating bill by up to 10%."
+  "Reducing your thermostat by just 1 degree in winter can cut your heating bill by up to 10%.",
 ];
 
 export function InsightsEmptyState() {
@@ -19,7 +19,10 @@ export function InsightsEmptyState() {
   }, []);
 
   return (
-    <div className="card insights-empty-wrapper" style={{ position: "relative", overflow: "hidden" }}>
+    <div
+      className="card insights-empty-wrapper"
+      style={{ position: "relative", overflow: "hidden" }}
+    >
       {/* Blurred background mock elements */}
       <div className="blurred-mockup" aria-hidden="true">
         <div className="mock-title"></div>
@@ -31,9 +34,12 @@ export function InsightsEmptyState() {
           <div className="mock-item"></div>
         </div>
       </div>
-      
+
       {/* Foreground Content */}
-      <div className="empty-state-content" style={{ position: "relative", zIndex: 10, textAlign: "center", padding: "3rem 2rem" }}>
+      <div
+        className="empty-state-content"
+        style={{ position: "relative", zIndex: 10, textAlign: "center", padding: "3rem 2rem" }}
+      >
         <div className="scanning-icon">
           <svg
             width="64"
@@ -52,7 +58,16 @@ export function InsightsEmptyState() {
             />
           </svg>
         </div>
-        <h2 style={{ border: "none", padding: 0, margin: "1rem 0 0.5rem 0", justifyContent: "center", background: "none", color: "#fff" }}>
+        <h2
+          style={{
+            border: "none",
+            padding: 0,
+            margin: "1rem 0 0.5rem 0",
+            justifyContent: "center",
+            background: "none",
+            color: "#fff",
+          }}
+        >
           Awaiting Your Data
         </h2>
         <p style={{ color: "var(--text)", margin: "0 0 2rem 0" }}>
@@ -61,7 +76,9 @@ export function InsightsEmptyState() {
 
         <div className="eco-fact-box" aria-live="polite">
           <span className="fact-label">Eco Fact</span>
-          <p className="fact-text" key={factIndex}>{ECO_FACTS[factIndex]}</p>
+          <p className="fact-text" key={factIndex}>
+            {ECO_FACTS[factIndex]}
+          </p>
         </div>
       </div>
     </div>

@@ -38,12 +38,12 @@ describe("debounce and throttle", () => {
 
     throttledFn();
     throttledFn();
-    
+
     expect(fn).toHaveBeenCalledTimes(1);
 
     vi.advanceTimersByTime(150);
     throttledFn();
-    
+
     expect(fn).toHaveBeenCalledTimes(2);
   });
 });

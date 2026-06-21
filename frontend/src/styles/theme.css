@@ -154,7 +154,6 @@ body {
   animation: pulseGlow 2s infinite ease-in-out;
 }
 
-
 /* App Header & Navigation */
 header.app-header {
   background: rgba(11, 15, 25, 0.85);
@@ -382,7 +381,10 @@ fieldset {
 
 .step-panel > fieldset {
   min-height: 0; /* Necessary for grid collapse */
-  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.4s;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease,
+    visibility 0.4s;
   opacity: 0;
   transform: translateY(10px);
   visibility: hidden;
@@ -972,7 +974,10 @@ table.history td {
   }
 }
 /* Off-screen rendering efficiency */
-.tip-card, .leaderboard-row, .challenge-card, .recommendation {
+.tip-card,
+.leaderboard-row,
+.challenge-card,
+.recommendation {
   content-visibility: auto;
   contain-intrinsic-size: 0 150px;
 }
@@ -1030,7 +1035,9 @@ table.history td {
   fill: var(--card-bg);
   stroke: var(--primary);
   stroke-width: 2;
-  transition: r 0.2s ease, fill 0.2s ease;
+  transition:
+    r 0.2s ease,
+    fill 0.2s ease;
 }
 
 .chart-point:hover {

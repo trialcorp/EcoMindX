@@ -47,24 +47,24 @@ export function ConfirmDialog({
   if (!open) return null;
 
   return (
-    <div className="confirm-overlay" onClick={onCancel} role="presentation">
+    <div
+      className="confirm-overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onCancel();
+      }}
+      role="presentation"
+    >
       <div
         className="confirm-dialog"
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
         aria-describedby="confirm-dialog-desc"
-        onClick={(e) => e.stopPropagation()}
       >
         <h3 id="confirm-dialog-title">{title}</h3>
         <p id="confirm-dialog-desc">{message}</p>
         <div className="confirm-actions">
-          <button
-            ref={cancelRef}
-            className="btn secondary"
-            onClick={onCancel}
-            type="button"
-          >
+          <button ref={cancelRef} className="btn secondary" onClick={onCancel} type="button">
             {cancelLabel}
           </button>
           <button

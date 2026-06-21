@@ -16,20 +16,20 @@ describe("InsightsPanel", () => {
         category: "home",
         action: "Use LED bulbs",
         estimated_annual_savings_kg: 200,
-      }
+      },
     ],
     source: "gemini" as const,
   };
 
   it("shows recommendations after generation delay", async () => {
     render(<InsightsPanel insights={mockInsights} />);
-    
+
     // Initially shows generation UI
     expect(screen.getByText("AI is analyzing your footprint...")).toBeInTheDocument();
 
     // Fast-forward or wait for the useEffect timeout
     await screen.findByText("Test Summary", undefined, { timeout: 3000 });
-    
+
     expect(screen.getByText(/Use public transit/)).toBeInTheDocument();
     expect(screen.getByText(/500 kg/)).toBeInTheDocument();
   });
@@ -40,11 +40,11 @@ describe("InsightsPanel", () => {
 
     const checkboxes = screen.getAllByRole("checkbox");
     fireEvent.click(checkboxes[0]); // Check public transit
-    
+
     expect(screen.getByText(/-500 kg/)).toBeInTheDocument(); // Potential savings header updates
-    
+
     fireEvent.click(checkboxes[1]); // Check LED bulbs
-    expect(screen.getByText(/-700 kg/)).toBeInTheDocument(); 
+    expect(screen.getByText(/-700 kg/)).toBeInTheDocument();
   });
 
   it("shows eco-pledge card when commitments are > 0", async () => {
@@ -53,7 +53,7 @@ describe("InsightsPanel", () => {
 
     const checkboxes = screen.getAllByRole("checkbox");
     fireEvent.click(checkboxes[0]);
-    
+
     expect(screen.getByText("My Eco-Pledge")).toBeInTheDocument();
   });
 

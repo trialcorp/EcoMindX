@@ -16,7 +16,7 @@ describe("CommunityHub", () => {
     },
   ];
 
-  const mockLeaderboard: any[] = [
+  const mockLeaderboard = [
     { user_id: "user-1", display_name: "Test User", score: 1000, isUser: true, name: "Test User" },
   ];
 
@@ -34,7 +34,7 @@ describe("CommunityHub", () => {
         user={null}
         onShareTip={mockOnShare}
         onDeleteTip={mockOnDelete}
-      />
+      />,
     );
 
     expect(screen.getByText("Test Tip")).toBeInTheDocument();
@@ -53,15 +53,22 @@ describe("CommunityHub", () => {
         user={null}
         onShareTip={mockOnShare}
         onDeleteTip={mockOnDelete}
-      />
+      />,
     );
 
     fireEvent.change(screen.getByLabelText(/Tip Title/), { target: { value: "New Tip" } });
-    fireEvent.change(screen.getByLabelText(/How does it help/), { target: { value: "It is good" } });
+    fireEvent.change(screen.getByLabelText(/How does it help/), {
+      target: { value: "It is good" },
+    });
     fireEvent.click(screen.getByText("Publish Tip"));
 
     await waitFor(() => {
-      expect(mockOnShare).toHaveBeenCalledWith("home", "New Tip", "It is good", "Anonymous Eco-Warrior");
+      expect(mockOnShare).toHaveBeenCalledWith(
+        "home",
+        "New Tip",
+        "It is good",
+        "Anonymous Eco-Warrior",
+      );
     });
   });
 
@@ -76,7 +83,7 @@ describe("CommunityHub", () => {
         user={null}
         onShareTip={mockOnShare}
         onDeleteTip={mockOnDelete}
-      />
+      />,
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();

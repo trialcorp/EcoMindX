@@ -40,6 +40,7 @@ const insights: InsightsResponse = {
 };
 
 beforeEach(() => {
+  localStorage.clear();
   vi.useFakeTimers({ shouldAdvanceTime: true });
   vi.clearAllMocks();
   vi.mocked(api.listEntries).mockResolvedValue([]);
@@ -130,7 +131,7 @@ describe("App", () => {
   });
 
   it("shows an error message when saving fails", async () => {
-    vi.mocked(api.saveEntry).mockRejectedValueOnce(new Error("boom"));
+    vi.mocked(api.saveEntry).mockRejectedValue(new Error("boom"));
     await renderApp();
     await userEvent.click(screen.getByRole("button", { name: /calculate my footprint/i }));
     await waitFor(() => screen.getByRole("button", { name: /save this entry/i }));

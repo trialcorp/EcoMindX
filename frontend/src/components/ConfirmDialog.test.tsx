@@ -12,7 +12,7 @@ describe("ConfirmDialog", () => {
         message="Test Message"
         onConfirm={vi.fn()}
         onCancel={vi.fn()}
-      />
+      />,
     );
     expect(screen.getByText("Test Title")).toBeInTheDocument();
     expect(screen.getByText("Test Message")).toBeInTheDocument();
@@ -26,7 +26,7 @@ describe("ConfirmDialog", () => {
         message="Test Message"
         onConfirm={vi.fn()}
         onCancel={vi.fn()}
-      />
+      />,
     );
     expect(container).toBeEmptyDOMElement();
   });
@@ -41,9 +41,9 @@ describe("ConfirmDialog", () => {
         message="Test Message"
         onConfirm={onConfirm}
         onCancel={onCancel}
-      />
+      />,
     );
-    
+
     fireEvent.click(screen.getByText("Confirm"));
     expect(onConfirm).toHaveBeenCalled();
 
@@ -60,10 +60,10 @@ describe("ConfirmDialog", () => {
         message="Test"
         onConfirm={vi.fn()}
         onCancel={onCancel}
-      />
+      />,
     );
-    
-    fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
+
+    fireEvent.keyDown(document, { key: "Escape", code: "Escape" });
     expect(onCancel).toHaveBeenCalled();
   });
 
@@ -75,7 +75,7 @@ describe("ConfirmDialog", () => {
         message="Test Message"
         onConfirm={vi.fn()}
         onCancel={vi.fn()}
-      />
+      />,
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();

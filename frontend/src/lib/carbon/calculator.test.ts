@@ -77,9 +77,17 @@ describe("Carbon Calculator Engine", () => {
 
   it("calculates different car fuel emissions correctly", () => {
     const km = 100;
-    const fuels: Array<CarbonInput["transport"]["car_fuel"]> = ["petrol", "diesel", "hybrid", "electric"];
-    const results = fuels.map(fuel => {
-      const input = { ...baseInput, transport: { ...baseInput.transport, car_km_per_week: km, car_fuel: fuel } };
+    const fuels: Array<CarbonInput["transport"]["car_fuel"]> = [
+      "petrol",
+      "diesel",
+      "hybrid",
+      "electric",
+    ];
+    const results = fuels.map((fuel) => {
+      const input = {
+        ...baseInput,
+        transport: { ...baseInput.transport, car_km_per_week: km, car_fuel: fuel },
+      };
       return calculateFootprint(input).breakdown_kg.transport;
     });
 

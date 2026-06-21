@@ -1,12 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import * as api from "../lib/api";
 import { getDeviceId } from "../lib/deviceId";
-import type {
-  CarbonInput,
-  Entry,
-  FootprintResult,
-  InsightsResponse,
-} from "../lib/types";
+import type { CarbonInput, Entry, FootprintResult, InsightsResponse } from "../lib/types";
 import type { User } from "@supabase/supabase-js";
 
 /**

@@ -55,12 +55,7 @@ export function AnalyticsTab({ result, lastInput, saving, onSave }: Props) {
         className="card"
         style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}
       >
-        <button
-          className="btn secondary"
-          onClick={onSave}
-          disabled={saving}
-          aria-busy={saving}
-        >
+        <button className="btn secondary" onClick={onSave} disabled={saving} aria-busy={saving}>
           {saving ? (
             <>
               <svg

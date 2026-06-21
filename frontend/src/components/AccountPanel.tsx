@@ -63,7 +63,7 @@ export function AccountPanel({
 
   if (user) {
     return (
-      <section className="card" role="region" aria-label="User profile">
+      <section className="card" aria-label="User profile">
         <h2>
           <svg
             width="24"
@@ -96,8 +96,8 @@ export function AccountPanel({
             <div className="sync-history-text">
               <h4>Sync Local History</h4>
               <p>
-                You have footprint snapshots on this device saved before logging in. Link
-                them to your account now.
+                You have footprint snapshots on this device saved before logging in. Link them to
+                your account now.
               </p>
             </div>
             <button
@@ -142,7 +142,7 @@ export function AccountPanel({
   }
 
   return (
-    <section className="card auth-box" role="region" aria-label="Sign in or register">
+    <section className="card auth-box" aria-label="Sign in or register">
       <div className="auth-header">
         <h3>{isSignUp ? "Create EcoMindX Account" : "Access Personal Intelligence"}</h3>
         <p>
@@ -168,9 +168,7 @@ export function AccountPanel({
       </div>
 
       {localAuthError && <div className="auth-error-alert">{localAuthError}</div>}
-      {authError && !localAuthError && (
-        <div className="auth-error-alert">{authError}</div>
-      )}
+      {authError && !localAuthError && <div className="auth-error-alert">{authError}</div>}
 
       {!isSupabaseConfigured && (
         <div
@@ -183,9 +181,9 @@ export function AccountPanel({
             marginBottom: "1rem",
           }}
         >
-          <strong>Setup Required:</strong> Vercel is missing your Supabase keys. You must
-          add <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> in
-          your Vercel Project Settings &gt; Environment Variables, and redeploy.
+          <strong>Setup Required:</strong> Vercel is missing your Supabase keys. You must add{" "}
+          <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> in your Vercel
+          Project Settings &gt; Environment Variables, and redeploy.
         </div>
       )}
 
