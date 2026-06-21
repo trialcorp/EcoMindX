@@ -36,6 +36,7 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="error-boundary-wrapper" role="alert">
           <svg
+            aria-hidden="true"
             width="64"
             height="64"
             viewBox="0 0 24 24"

@@ -219,7 +219,7 @@ describe("useFootprint", () => {
 
   it("warns when writing to localStorage fails", () => {
     const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    
+
     // Set initial values in localStorage first using direct API
     localStorage.setItem("ecomindx_active_result", JSON.stringify(mockResult));
     localStorage.setItem("ecomindx_active_input", JSON.stringify(mockInput));
@@ -237,4 +237,3 @@ describe("useFootprint", () => {
     mockSetItem.mockRestore();
   });
 });
-

@@ -111,8 +111,6 @@ describe("calculateFootprint — edge cases", () => {
     };
     const petrolResult = calculateFootprint(petrolInput);
     const electricResult = calculateFootprint(electricInput);
-    expect(electricResult.breakdown_kg.transport).toBeLessThan(
-      petrolResult.breakdown_kg.transport,
-    );
+    expect(electricResult.breakdown_kg.transport).toBeLessThan(petrolResult.breakdown_kg.transport);
   });
 });

@@ -33,9 +33,10 @@ describe("EcoChallenges", () => {
       fill: vi.fn(),
       fillRect: vi.fn(),
     };
-    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(mockCtx as unknown as CanvasRenderingContext2D);
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(
+      mockCtx as unknown as CanvasRenderingContext2D,
+    );
   });
-
 
   it("calculates level progression and renders active challenges", () => {
     render(<EcoChallenges highestCategory={null} />);
@@ -102,7 +103,6 @@ describe("EcoChallenges", () => {
     vi.useRealTimers();
   });
 
-
   it("shows recommended quests based on highest category", () => {
     render(<EcoChallenges highestCategory="transport" />);
     // "No-Drive Day" is a transport challenge
@@ -118,8 +118,24 @@ describe("EcoChallenges", () => {
 
   it("shows max level reached when user has enough points", () => {
     const completedChallenges = [
-      { id: "c1", category: "diet", title: "T1", desc: "D1", reward: 500, difficulty: "easy", status: "completed" },
-      { id: "c2", category: "diet", title: "T2", desc: "D2", reward: 600, difficulty: "easy", status: "completed" },
+      {
+        id: "c1",
+        category: "diet",
+        title: "T1",
+        desc: "D1",
+        reward: 500,
+        difficulty: "easy",
+        status: "completed",
+      },
+      {
+        id: "c2",
+        category: "diet",
+        title: "T2",
+        desc: "D2",
+        reward: 600,
+        difficulty: "easy",
+        status: "completed",
+      },
     ];
     localStorage.setItem("ecomindx_quests_v2", JSON.stringify(completedChallenges));
 
@@ -130,7 +146,15 @@ describe("EcoChallenges", () => {
 
   it("allows abandoning a completed challenge", () => {
     const completedChallenges = [
-      { id: "c1", category: "diet", title: "T1", desc: "D1", reward: 100, difficulty: "easy", status: "completed" },
+      {
+        id: "c1",
+        category: "diet",
+        title: "T1",
+        desc: "D1",
+        reward: 100,
+        difficulty: "easy",
+        status: "completed",
+      },
     ];
     localStorage.setItem("ecomindx_quests_v2", JSON.stringify(completedChallenges));
 

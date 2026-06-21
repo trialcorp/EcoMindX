@@ -39,12 +39,27 @@ describe("ResultBreakdown", () => {
   });
 
   it("shows category analysis when clicking on different categories", async () => {
-    render(<ResultBreakdown result={result} input={{
-      transport: { car_km_per_week: 100, car_fuel: "petrol", public_transit_km_per_week: 50, short_haul_flights_per_year: 2, long_haul_flights_per_year: 1 },
-      home: { electricity_kwh_per_month: 200, natural_gas_kwh_per_month: 100, household_size: 2 },
-      diet: "heavy_meat",
-      consumption: { goods_spend_usd_per_month: 150, waste_kg_per_week: 10 }
-    }} />);
+    render(
+      <ResultBreakdown
+        result={result}
+        input={{
+          transport: {
+            car_km_per_week: 100,
+            car_fuel: "petrol",
+            public_transit_km_per_week: 50,
+            short_haul_flights_per_year: 2,
+            long_haul_flights_per_year: 1,
+          },
+          home: {
+            electricity_kwh_per_month: 200,
+            natural_gas_kwh_per_month: 100,
+            household_size: 2,
+          },
+          diet: "heavy_meat",
+          consumption: { goods_spend_usd_per_month: 150, waste_kg_per_week: 10 },
+        }}
+      />,
+    );
 
     // Click on Diet
     const dietRow = screen.getByRole("button", { name: /diet/i });
@@ -74,16 +89,27 @@ describe("ResultBreakdown", () => {
   });
 
   it("renders different diet details correctly", () => {
-    const diets: Array<"heavy_meat" | "medium_meat" | "low_meat" | "pescatarian" | "vegetarian" | "vegan"> = [
-      "heavy_meat", "medium_meat", "low_meat", "pescatarian", "vegetarian", "vegan"
-    ];
+    const diets: Array<
+      "heavy_meat" | "medium_meat" | "low_meat" | "pescatarian" | "vegetarian" | "vegan"
+    > = ["heavy_meat", "medium_meat", "low_meat", "pescatarian", "vegetarian", "vegan"];
     for (const diet of diets) {
-      const { unmount } = render(<ResultBreakdown result={result} input={{
-        transport: { car_km_per_week: 0, car_fuel: "petrol", public_transit_km_per_week: 0, short_haul_flights_per_year: 0, long_haul_flights_per_year: 0 },
-        home: { electricity_kwh_per_month: 0, natural_gas_kwh_per_month: 0, household_size: 1 },
-        diet,
-        consumption: { goods_spend_usd_per_month: 0, waste_kg_per_week: 0 }
-      }} />);
+      const { unmount } = render(
+        <ResultBreakdown
+          result={result}
+          input={{
+            transport: {
+              car_km_per_week: 0,
+              car_fuel: "petrol",
+              public_transit_km_per_week: 0,
+              short_haul_flights_per_year: 0,
+              long_haul_flights_per_year: 0,
+            },
+            home: { electricity_kwh_per_month: 0, natural_gas_kwh_per_month: 0, household_size: 1 },
+            diet,
+            consumption: { goods_spend_usd_per_month: 0, waste_kg_per_week: 0 },
+          }}
+        />,
+      );
       // Click on Diet row to select it
       const dietRow = screen.getByRole("button", { name: /diet/i });
       fireEvent.click(dietRow);
@@ -91,10 +117,13 @@ describe("ResultBreakdown", () => {
       // Verify the details card contains some specific diet text
       if (diet === "vegan") expect(screen.getByText(/Purely plant-based/i)).toBeInTheDocument();
       if (diet === "vegetarian") expect(screen.getByText(/No meat or fish/i)).toBeInTheDocument();
-      if (diet === "pescatarian") expect(screen.getByText(/Fish and plants only/i)).toBeInTheDocument();
+      if (diet === "pescatarian")
+        expect(screen.getByText(/Fish and plants only/i)).toBeInTheDocument();
       if (diet === "low_meat") expect(screen.getByText(/Reduced meat intake/i)).toBeInTheDocument();
-      if (diet === "medium_meat") expect(screen.getByText(/Typical mixed diet/i)).toBeInTheDocument();
-      if (diet === "heavy_meat") expect(screen.getByText(/High impact due to/i)).toBeInTheDocument();
+      if (diet === "medium_meat")
+        expect(screen.getByText(/Typical mixed diet/i)).toBeInTheDocument();
+      if (diet === "heavy_meat")
+        expect(screen.getByText(/High impact due to/i)).toBeInTheDocument();
 
       unmount();
     }
@@ -123,22 +152,19 @@ describe("ResultBreakdown", () => {
     if (g.process?.env) {
       g.process.env.NODE_ENV = "production";
     }
-    
+
     vi.useFakeTimers();
     const { unmount } = render(<ResultBreakdown result={result} />);
-    
+
     act(() => {
       vi.advanceTimersByTime(50);
     });
 
     unmount();
-    
+
     if (g.process?.env && originalEnv) {
       g.process.env.NODE_ENV = originalEnv;
     }
     vi.useRealTimers();
   });
 });
-
-
-

@@ -26,6 +26,41 @@ type TabType =
  * Orchestrates navigation, layout, and delegates each tab to a focused component.
  * Business logic is split across three hooks: useAuth, useCommunity, useFootprint.
  */
+
+// Navigation tab definitions extracted to prevent recreation on every render
+const NAV_TABS: Array<{ id: TabType; label: string; icon: string }> = [
+  {
+    id: "calculator",
+    label: "Carbon Calculator",
+    icon: "M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z",
+  },
+  {
+    id: "analytics",
+    label: "Sustain Analytics",
+    icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z",
+  },
+  { id: "insights", label: "AI Action Plan", icon: "M13 10V3L4 14h7v7l9-11h-7z" },
+  {
+    id: "community",
+    label: "Community Hub",
+    icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
+  },
+  {
+    id: "challenges",
+    label: "Eco-Challenges",
+    icon: "M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7",
+  },
+  {
+    id: "account",
+    label: "My Account",
+    icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
+  },
+  {
+    id: "history",
+    label: "Tracking History",
+    icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
+  },
+];
 export default function App() {
   const { user, authLoading, authError, signIn, signUp, signOut } = useAuth();
 
@@ -98,9 +133,7 @@ export default function App() {
     }));
 
     if (userEmissions !== null) {
-      const alreadyExists = list.some(
-        (item) => item.isUser || (user && item.user_id === user.id),
-      );
+      const alreadyExists = list.some((item) => item.isUser || (user && item.user_id === user.id));
       if (!alreadyExists) {
         list.push({
           display_name: user?.email ? `${user.email.split("@")[0]} (You)` : "You",
@@ -138,40 +171,7 @@ export default function App() {
     await deleteTip(tipId);
   };
 
-  // Navigation tab definitions for DRY rendering
-  const NAV_TABS: Array<{ id: TabType; label: string; icon: string }> = [
-    {
-      id: "calculator",
-      label: "Carbon Calculator",
-      icon: "M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z",
-    },
-    {
-      id: "analytics",
-      label: "Sustain Analytics",
-      icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z",
-    },
-    { id: "insights", label: "AI Action Plan", icon: "M13 10V3L4 14h7v7l9-11h-7z" },
-    {
-      id: "community",
-      label: "Community Hub",
-      icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
-    },
-    {
-      id: "challenges",
-      label: "Eco-Challenges",
-      icon: "M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7",
-    },
-    {
-      id: "account",
-      label: "My Account",
-      icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
-    },
-    {
-      id: "history",
-      label: "Tracking History",
-      icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
-    },
-  ];
+  // Navigation tab definitions are declared statically above the component
 
   return (
     <>
@@ -187,6 +187,7 @@ export default function App() {
         <div className="brand-wrapper">
           <div className="brand-logo" aria-hidden="true">
             <svg
+              aria-hidden="true"
               width="32"
               height="32"
               viewBox="0 0 32 32"
@@ -252,6 +253,7 @@ export default function App() {
                 aria-controls={`panel-${tab.id}`}
               >
                 <svg
+                  aria-hidden="true"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

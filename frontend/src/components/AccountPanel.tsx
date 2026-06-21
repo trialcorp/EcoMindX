@@ -77,6 +77,7 @@ export function AccountPanel({
       <section className="card" aria-label="User profile">
         <h2>
           <svg
+            aria-hidden="true"
             width="24"
             height="24"
             viewBox="0 0 24 24"
@@ -85,9 +86,9 @@ export function AccountPanel({
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-          className="icon-primary"
-          xmlns="http://www.w3.org/2000/svg"
-        >
+            className="icon-primary"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
             <circle cx="12" cy="7" r="4" />
           </svg>
@@ -213,6 +214,7 @@ export function AccountPanel({
             {authLoading ? (
               <>
                 <svg
+                  aria-hidden="true"
                   className="spinner mr-s"
                   width="16"
                   height="16"

@@ -1,3 +1,11 @@
+/**
+ * Application Entry Point
+ *
+ * Bootstraps the React application by mounting the root component
+ * inside a StrictMode and ErrorBoundary wrapper.
+ *
+ * @module main
+ */
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";

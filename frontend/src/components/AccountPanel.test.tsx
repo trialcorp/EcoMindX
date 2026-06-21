@@ -134,7 +134,9 @@ describe("AccountPanel", () => {
       />,
     );
 
-    fireEvent.change(screen.getByLabelText("Email Address"), { target: { value: "test@test.com" } });
+    fireEvent.change(screen.getByLabelText("Email Address"), {
+      target: { value: "test@test.com" },
+    });
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "password123" } });
     fireEvent.click(screen.getByRole("button", { name: "Sign In" }));
 
@@ -220,7 +222,9 @@ describe("AccountPanel", () => {
       />,
     );
 
-    fireEvent.change(screen.getByLabelText("Email Address"), { target: { value: "test@test.com" } });
+    fireEvent.change(screen.getByLabelText("Email Address"), {
+      target: { value: "test@test.com" },
+    });
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "password123" } });
     fireEvent.click(screen.getByRole("button", { name: "Sign In" }));
 

@@ -80,7 +80,7 @@ describe("useCommunity", () => {
 
     await act(async () => {
       await expect(
-        result.current.shareTip("home", "Title", "Desc", "Author", "user-123")
+        result.current.shareTip("home", "Title", "Desc", "Author", "user-123"),
       ).rejects.toThrow("share error");
     });
 
@@ -94,7 +94,7 @@ describe("useCommunity", () => {
 
     await act(async () => {
       await expect(
-        result.current.shareTip("home", "Title", "Desc", "Author", "user-123")
+        result.current.shareTip("home", "Title", "Desc", "Author", "user-123"),
       ).rejects.toBe("string error");
     });
 

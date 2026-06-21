@@ -42,6 +42,7 @@ export function InsightsEmptyState() {
       <div className="empty-state-content">
         <div className="scanning-icon">
           <svg
+            aria-hidden="true"
             width="64"
             height="64"
             viewBox="0 0 24 24"

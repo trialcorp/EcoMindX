@@ -16,7 +16,8 @@ export function HistoryPanel({ entries }: Props) {
     return (
       <section className="card" aria-labelledby="history-heading">
         <h2 id="history-heading">
-          <svg aria-hidden="true"
+          <svg
+            aria-hidden="true"
             width="24"
             height="24"
             viewBox="0 0 24 24"
@@ -75,7 +76,8 @@ export function HistoryPanel({ entries }: Props) {
   return (
     <section className="card" aria-labelledby="history-heading">
       <h2 id="history-heading">
-        <svg aria-hidden="true"
+        <svg
+          aria-hidden="true"
           width="24"
           height="24"
           viewBox="0 0 24 24"
@@ -118,7 +120,8 @@ export function HistoryPanel({ entries }: Props) {
         >
           <h3 className="trend-chart-title">Emissions Trend</h3>
           <div className="trend-chart-svg-wrapper">
-            <svg aria-hidden="true"
+            <svg
+              aria-hidden="true"
               viewBox={`0 0 ${svgWidth} ${svgHeight}`}
               className="trend-chart-svg"
               preserveAspectRatio="none"

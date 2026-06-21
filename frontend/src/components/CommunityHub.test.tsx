@@ -28,7 +28,6 @@ describe("CommunityHub", () => {
   const mockOnShare = vi.fn().mockResolvedValue(undefined);
   const mockOnDelete = vi.fn().mockResolvedValue(undefined);
 
-
   it("renders the leaderboard and tips", () => {
     render(
       <CommunityHub
@@ -235,4 +234,3 @@ describe("CommunityHub", () => {
     expect(screen.getByText("Loading community data...")).toBeInTheDocument();
   });
 });
-

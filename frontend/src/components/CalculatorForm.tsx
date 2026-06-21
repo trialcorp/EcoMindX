@@ -102,6 +102,7 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
     <form className="card" onSubmit={handleSubmit} aria-labelledby="calc-heading">
       <h2 id="calc-heading">
         <svg
+          aria-hidden="true"
           width="24"
           height="24"
           viewBox="0 0 24 24"
@@ -303,6 +304,7 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
           >
             Continue
             <svg
+              aria-hidden="true"
               width="16"
               height="16"
               viewBox="0 0 24 24"

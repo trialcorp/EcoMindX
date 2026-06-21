@@ -62,26 +62,23 @@ describe("NumberField", () => {
   it("handles range slider change and updates value", () => {
     const onChange = vi.fn();
     const { container } = render(
-      <NumberField id="n" label="Amount" max={100} value={10} onChange={onChange} />
+      <NumberField id="n" label="Amount" max={100} value={10} onChange={onChange} />,
     );
     const rangeInput = container.querySelector('input[type="range"]');
     expect(rangeInput).toBeInTheDocument();
-    
+
     fireEvent.change(rangeInput!, { target: { value: "50" } });
     expect(onChange).toHaveBeenCalledWith(50);
   });
 
   it("syncs value with external prop updates", () => {
     const { rerender } = render(
-      <NumberField id="n" label="Amount" max={100} value={10} onChange={() => {}} />
+      <NumberField id="n" label="Amount" max={100} value={10} onChange={() => {}} />,
     );
     const input = screen.getByLabelText("Amount") as HTMLInputElement;
     expect(input.value).toBe("10");
 
-    rerender(
-      <NumberField id="n" label="Amount" max={100} value={20} onChange={() => {}} />
-    );
+    rerender(<NumberField id="n" label="Amount" max={100} value={20} onChange={() => {}} />);
     expect(input.value).toBe("20");
   });
 });
-

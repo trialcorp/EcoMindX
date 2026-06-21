@@ -18,7 +18,6 @@ let mockSupabase: unknown = {
   },
 };
 
-
 vi.mock("../lib/supabaseClient", () => ({
   get supabase() {
     return mockSupabase;
@@ -42,7 +41,6 @@ describe("useAuth", () => {
       data: { subscription: { unsubscribe: vi.fn() } },
     });
   });
-
 
   it("recovers initial session on mount", async () => {
     const mockUser = { id: "user-123", email: "test@example.com" };
@@ -73,7 +71,9 @@ describe("useAuth", () => {
   });
 
   it("subscribes to auth state changes and updates user", async () => {
-    let changeCallback: ((event: string, session: { user: { id: string; email: string } } | null) => void) | undefined;
+    let changeCallback:
+      | ((event: string, session: { user: { id: string; email: string } } | null) => void)
+      | undefined;
     mockOnAuthStateChange.mockImplementation((cb) => {
       changeCallback = cb;
       return { data: { subscription: { unsubscribe: vi.fn() } } };
@@ -118,7 +118,9 @@ describe("useAuth", () => {
     const { result } = renderHook(() => useAuth());
 
     await act(async () => {
-      await expect(result.current.signUp("new@example.com", "password123")).rejects.toThrow("sign up failed");
+      await expect(result.current.signUp("new@example.com", "password123")).rejects.toThrow(
+        "sign up failed",
+      );
     });
 
     expect(result.current.authError).toBe("sign up failed");
@@ -146,7 +148,9 @@ describe("useAuth", () => {
     const { result } = renderHook(() => useAuth());
 
     await act(async () => {
-      await expect(result.current.signIn("in@example.com", "password123")).rejects.toThrow("sign in failed");
+      await expect(result.current.signIn("in@example.com", "password123")).rejects.toThrow(
+        "sign in failed",
+      );
     });
 
     expect(result.current.authError).toBe("sign in failed");
@@ -189,4 +193,3 @@ describe("useAuth", () => {
     expect(hookResult?.current.authLoading).toBe(false);
   });
 });
-

@@ -140,7 +140,6 @@ describe("api client", () => {
     );
   });
 
-
   it("lists entries for a device", async () => {
     const mockLimit = vi.fn().mockResolvedValue({
       data: [
@@ -272,9 +271,7 @@ describe("api client", () => {
       });
       mockSelect.mockReturnValue({ order: mockOrderLocal });
 
-      await expect(api.listLeaderboard()).rejects.toThrow(
-        /Failed to load leaderboard: db error/,
-      );
+      await expect(api.listLeaderboard()).rejects.toThrow(/Failed to load leaderboard: db error/);
     });
   });
 
@@ -298,9 +295,7 @@ describe("api client", () => {
   describe("listTips", () => {
     it("returns community tips", async () => {
       const mockOrderLocal = vi.fn().mockResolvedValue({
-        data: [
-          { id: "t1", title: "Tip 1", category: "home" },
-        ],
+        data: [{ id: "t1", title: "Tip 1", category: "home" }],
         error: null,
       });
       mockSelect.mockReturnValue({ order: mockOrderLocal });
@@ -317,9 +312,7 @@ describe("api client", () => {
       });
       mockSelect.mockReturnValue({ order: mockOrderLocal });
 
-      await expect(api.listTips()).rejects.toThrow(
-        /Failed to load tips: load tips error/,
-      );
+      await expect(api.listTips()).rejects.toThrow(/Failed to load tips: load tips error/);
     });
   });
 

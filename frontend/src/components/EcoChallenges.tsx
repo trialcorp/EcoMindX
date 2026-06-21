@@ -172,7 +172,8 @@ function CategoryPill({ category }: { category: "diet" | "transport" | "home" | 
     switch (category) {
       case "diet":
         return (
-          <svg aria-hidden="true"
+          <svg
+            aria-hidden="true"
             width="12"
             height="12"
             viewBox="0 0 24 24"
@@ -189,7 +190,8 @@ function CategoryPill({ category }: { category: "diet" | "transport" | "home" | 
         );
       case "transport":
         return (
-          <svg aria-hidden="true"
+          <svg
+            aria-hidden="true"
             width="12"
             height="12"
             viewBox="0 0 24 24"
@@ -208,7 +210,8 @@ function CategoryPill({ category }: { category: "diet" | "transport" | "home" | 
         );
       case "home":
         return (
-          <svg aria-hidden="true"
+          <svg
+            aria-hidden="true"
             width="12"
             height="12"
             viewBox="0 0 24 24"
@@ -223,7 +226,8 @@ function CategoryPill({ category }: { category: "diet" | "transport" | "home" | 
         );
       case "consumption":
         return (
-          <svg aria-hidden="true"
+          <svg
+            aria-hidden="true"
             width="12"
             height="12"
             viewBox="0 0 24 24"
@@ -423,6 +427,7 @@ export function EcoChallenges({ highestCategory }: Props) {
       <section className="card" aria-label="Eco-Challenges">
         <h2>
           <svg
+            aria-hidden="true"
             width="24"
             height="24"
             viewBox="0 0 24 24"
@@ -433,7 +438,6 @@ export function EcoChallenges({ highestCategory }: Props) {
             strokeLinejoin="round"
             className="icon-primary"
             xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
           >
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
           </svg>
@@ -552,6 +556,7 @@ export function EcoChallenges({ highestCategory }: Props) {
                     <div className="challenge-reward-status">
                       <span className="challenge-reward-badge" title="Reward points">
                         <svg
+                          aria-hidden="true"
                           width="12"
                           height="12"
                           viewBox="0 0 24 24"
@@ -561,7 +566,6 @@ export function EcoChallenges({ highestCategory }: Props) {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           className="mr-xs"
-                          aria-hidden="true"
                         >
                           <circle cx="12" cy="12" r="8" />
                           <line x1="12" y1="8" x2="12" y2="16" />

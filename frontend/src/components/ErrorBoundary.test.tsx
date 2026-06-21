@@ -38,7 +38,7 @@ describe("ErrorBoundary", () => {
     expect(screen.getByRole("alert")).toBeInTheDocument();
     expect(screen.getByText("Something went wrong")).toBeInTheDocument();
     expect(screen.getByText("Test crash")).toBeInTheDocument();
-    
+
     const reloadBtn = screen.getByRole("button", { name: "Reload Page" });
     expect(reloadBtn).toBeInTheDocument();
     await userEvent.click(reloadBtn);
@@ -49,4 +49,3 @@ describe("ErrorBoundary", () => {
     vi.unstubAllGlobals();
   });
 });
-

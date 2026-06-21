@@ -125,6 +125,7 @@ export function CommunityHub({
 
       <h2 id="community-heading">
         <svg
+          aria-hidden="true"
           width="24"
           height="24"
           viewBox="0 0 24 24"
@@ -152,6 +153,7 @@ export function CommunityHub({
       {loadingCommunity && !leaderboardUsers.length ? (
         <div className="community-spinner-container">
           <svg
+            aria-hidden="true"
             className="spinner"
             width="32"
             height="32"
@@ -273,6 +275,7 @@ export function CommunityHub({
                       aria-label="Delete this tip"
                     >
                       <svg
+                        aria-hidden="true"
                         width="16"
                         height="16"
                         viewBox="0 0 24 24"

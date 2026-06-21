@@ -20,7 +20,8 @@ export function AnalyticsTab({ result, lastInput, saving, onSave }: Props) {
   if (!result) {
     return (
       <div className="card text-center py-xl">
-        <svg aria-hidden="true"
+        <svg
+          aria-hidden="true"
           width="64"
           height="64"
           viewBox="0 0 24 24"
@@ -36,9 +37,7 @@ export function AnalyticsTab({ result, lastInput, saving, onSave }: Props) {
             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
           />
         </svg>
-        <h2 className="m-0" style={{ border: "none", padding: 0, justifyContent: "center" }}>
-          No Assessment Data
-        </h2>
+        <h2 className="m-0 text-center border-none p-0">No Assessment Data</h2>
         <p className="text-muted m-0">
           Please complete your annual footprint assessment first in the Carbon Calculator tab.
         </p>
@@ -53,7 +52,8 @@ export function AnalyticsTab({ result, lastInput, saving, onSave }: Props) {
         <button className="btn secondary" onClick={onSave} disabled={saving} aria-busy={saving}>
           {saving ? (
             <>
-              <svg aria-hidden="true"
+              <svg
+                aria-hidden="true"
                 className="spinner mr-s"
                 width="16"
                 height="16"
